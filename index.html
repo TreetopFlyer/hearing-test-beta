@@ -1,6 +1,23 @@
-<svg>
-
-</svg>
-<link rel="stylesheet" type="text/css" href="https://static1.squarespace.com/static/sitecss/565afe39e4b0c377c4681146/45/52a74dafe4b073a80cd253c5/565afe3ae4b0c377c468114d/1043/site.css"/>
+<p class="text-red-500 p-4">outside (should ignore classes and be unstyled)</p>
 <div id="app"></div>
-<script src="app.js" type="module"></script>
+
+<script type="module">
+import React from "https://esm.sh/preact@10.11.3/compat";
+
+import * as TW from "https://esm.sh/@twind/core@1.0.1";
+import TWPreTail from "https://esm.sh/@twind/preset-tailwind@1.0.1";
+import TWPreAuto from "https://esm.sh/@twind/preset-autoprefix@1.0.1";
+
+const styles = document.createElement("style");
+const root = document.querySelector("#app");
+
+const appShadow = root.attachShadow({mode: "closed"});
+const appShadowRoot = document.createElement("div");
+appShadow.append(styles);
+appShadow.append(appShadowRoot);
+
+const inst = TW.twind({presets:[TWPreTail(), TWPreAuto()]}, TW.dom(styles))
+TW.observe(inst, appShadowRoot)
+
+React.render(React.createElement("p", {className:"text(yellow-500 lg) p-4 font(sans-black)"}, "inside (should be styled)"), appShadowRoot);
+</script>
