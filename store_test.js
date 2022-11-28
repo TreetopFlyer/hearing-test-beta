@@ -2,7 +2,7 @@ import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
 import { Initial, Reducer, ColumnMapping } from "./store.js";
 
 const States = {
-    list:[],
+    list:[Initial],
     get latest()
     {
         return this.list[this.list.length-1];
@@ -13,49 +13,98 @@ const States = {
     }
 };
 
-States.latest = Initial;
-
 Deno.test("Initial State", async (t)=>
 {
-    const state = Initial;
-
     await t.step("Selections are empty", ()=>
     {
-        assertEquals(state.Selection.Test, undefined);
-        assertEquals(state.Selection.Freq, undefined);
-        assertEquals(state.Selection.Mark, undefined);
+        assertEquals(States.latest.Live.Test, undefined);
+        assertEquals(States.latest.Live.Freq, undefined);
+        assertEquals(States.latest.Live.Mark, undefined);
     });
 
     await t.step("Frequency index maps to 1k hz", ()=>
     {
-        assertEquals(state.Freq, 3);
-        assertEquals(ColumnMapping[state.Freq][0], 1000);
+        assertEquals(States.latest.Freq, 3);
+        assertEquals(ColumnMapping[States.latest.Freq][0], 1000);
     });
 
-    await t.step("The first test has its 2nd plot at 1k hz, and no user marks", ()=>
+    await t.step("The first test has its 2nd plot at 1k hz", ()=>
     {
-        const plot = state.Tests[0].Plot[1];
+        const plot = States.latest.Tests[0].Plot[1];
         assertEquals(plot.Hz, 1000);
-        assertEquals(plot.UserL, undefined);
-        assertEquals(plot.UserR, undefined);
     });
 })
 
-Deno.test("Select Test", async (t)=>
+Deno.test("Select First Test", async (t)=>
 {
-    let state;
     await t.step("dispatch action", ()=>
     {
-        state = Reducer(Initial, {Name:"Test", Data:0});
+        States.latest = Reducer(States.latest, {Name:"Test", Data:0});
     });
     
     await t.step("check selections: test and freq, but no mark", ()=>
     {
-        assertEquals(state.Selection.Test, state.Tests[0]);
-        assertEquals(state.Selection.Freq, state.Tests[0].Plot[1]);
-        assertEquals(state.Selection.Mark, undefined);
+        const s = States.latest;
+        assertEquals(s.Live.Test, s.Tests[0]);
+        assertEquals(s.Live.Freq, s.Tests[0].Plot[1]);
+        assertEquals(s.Live.Mark, undefined);
+    });
+});
+
+Deno.test("Make Marks", async (t)=>
+{
+    let s;
+    await t.step("Left channel selected", ()=>
+    {
+        assertEquals(States.latest.Chan, 0);
+    });
+    await t.step("Dispatch Mark action", ()=>
+    {
+        States.latest = Reducer(States.latest, {Name:"Mark", Data:true});
+    });
+    s = States.latest;
+
+    await t.step("Check selections: test, freq, and mark", ()=>
+    {
+        assertEquals(s.Live.Test, s.Tests[0]);
+        assertEquals(s.Live.Freq, s.Tests[0].Plot[1]);
+        assertEquals(s.Live.Mark, s.Tests[0].Plot[1].UserL);
     });
 
+    await t.step("Check marked value", ()=>
+    {
+        assertEquals(s.Live.Mark.Stim, s.Stim);
+        assertEquals(s.Live.Mark.Resp, true);
+    });
 
-    
-})
+    await t.step("Dispatch Mark delete action", ()=>
+    {
+        States.latest = Reducer(States.latest, {Name:"Mark", Data:null});
+    });
+    s = States.latest;
+
+    await t.step("Check marked value", ()=>
+    {
+        assertEquals(States.latest.Live.Mark, undefined);
+    });
+
+});
+
+
+Deno.test("Update Tone State", async(t)=>
+{
+    await t.step("all three", ()=>
+    {
+        States.latest = Reducer(States.latest, {Name:"Freq", Data:2});
+        States.latest = Reducer(States.latest, {Name:"Stim", Data:25});
+        States.latest = Reducer(States.latest, {Name:"Chan", Data:1});
+    });
+
+    await t.step("check tone values", ()=>
+    {
+        
+        assertEquals(States.latest.Stim, 25);
+        assertEquals(States.latest.Freq, 2);
+        assertEquals(States.latest.Chan, 1);
+    });
+});
