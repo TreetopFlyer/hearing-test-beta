@@ -3,6 +3,7 @@ import * as TW   from "https://esm.sh/@twind/core@1.0.1";
 import TWPreTail from "https://esm.sh/@twind/preset-tailwind@1.0.1";
 import TWPreAuto from "https://esm.sh/@twind/preset-autoprefix@1.0.1";
 
+/** @type {TW.TwindConfig} */
 const Configure = {
     theme:
     {
@@ -41,8 +42,9 @@ const Configure = {
         [
             "stroke-draw",
             {
-                "vector-effect":"non-scaling-stroke",
-                "stroke-linecap":"square"
+                "vector-effect": "non-scaling-stroke",
+                "stroke-linecap": "square",
+                "fill": "none"
             },
         ],
         [
@@ -77,8 +79,10 @@ render(html`
     <${UI.Button} inactive>Right<//>
     <${UI.Button} disabled>Right<//>
     <${UI.Chart}>
-        <svg class="overflow-visible stroke(blue-700 bold draw)">
-            <${UI.Mark} />
+        <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
+            <${UI.Mark} right=${true}  x=${"20%"} y="20%" />
+            <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
+            <${UI.Mark} right=${false}/>
         </svg>
     <//>
 `, ShadowDiv);
