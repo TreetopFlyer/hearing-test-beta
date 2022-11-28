@@ -58,51 +58,60 @@ export const Initial =
 /** @typedef {{Name:"Test", Data:number}} ActionTest*/
 /** @typedef {ActionMark|ActionTest} Action */
 /** @typedef {(inState:State, inAction:Action)=>State} Reducer */
+/** @typedef {(inState:State)=>boolean} SelectionUpdater */
+/** @type {Record<string, SelectionUpdater>} */
+const Update = {
+    Freq(inState)
+    {
+        const column = ColumnMapping[inState.Freq];
+        if(column && inState.Selection.Test)
+        {
+            const hz = column[0];
+            inState.Selection.Freq = undefined;
+            for(let i=0; i<inState.Selection.Test.Plot.length; i++)
+            {
+                const plot = inState.Selection.Test.Plot[i];
+                if(plot.Hz == hz)
+                {
+                    inState.Selection.Freq = plot;
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+    Mark(inState)
+    {
+        const freq = inState.Selection.Freq;
+        if(freq)
+        {
+            if(inState.Chan == "left" && freq.UserL)
+            {
+                inState.Selection.Mark = freq.UserL;
+                return true;
+            }
+            else if(inState.Chan == "right" && freq.UserR)
+            {
+                inState.Selection.Mark = freq.UserR;
+                return true;
+            }
+        }
+        return false;
+    }
+};
 /** @type {Reducer} */
 export function Reducer(inState, inAction)
 {
     const clone = {...inState};
+
     switch(inAction.Name)
     {
         case "Test" :
         {
-
-            let selTest = clone.Tests[inAction.Data];
-            let selFreq = undefined;
-            let selMark = undefined;
-            const column = ColumnLookup(clone.Freq);
-            if(column)
-            {
-                let hz = column[0];
-                let plot;
-                for(let i=0; i<selTest.Plot.length; i++)
-                {
-                    plot = selTest.Plot[i];
-                    if(plot.Hz == hz)
-                    {
-                        selFreq = plot;
-                        if(clone.Chan == "left" && selFreq.UserL)
-                        {
-                            selMark = selFreq.UserL;
-                        }
-                        else if(clone.Chan == "right" && selFreq.UserR)
-                        {
-                            selMark = selFreq.UserR;
-                        }
-                    }
-                }
-            }
-            const freq = test.Plot[]
-            //clone.Selection = {...clone.Selection, Test:clone.Tests[inAction.Data]}
+            clone.Selection.Test = clone.Tests[inAction.Data];
+            Update.Freq(clone);
+            Update.Mark(clone);
             break;
-        }
-        case "Mark" :
-        {
-            if(clone.Test)
-            {
-                clone.Test.Plot
-
-            }
         }
     }
     return clone;
