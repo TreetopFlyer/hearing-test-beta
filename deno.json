@@ -2,6 +2,6 @@
     "tasks":
     {
         "fs": "deno run -A --no-lock https://deno.land/std@0.166.0/http/file_server.ts",
-        "test": "deno test 'store_test.js' --no-lock"
+        "test": "deno test test/store_test.js --no-lock --watch"
     }
 }
