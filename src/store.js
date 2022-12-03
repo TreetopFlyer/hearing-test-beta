@@ -1,6 +1,6 @@
 //@ts-check
 
-const size = 100/6;
+const size = 1/6;
 /** @typedef {[frequency:number, position:number, normal:boolean]} ColumnMapping  */
 /** @type {Array<ColumnMapping>} */
 export const ColumnMapping = [
@@ -25,7 +25,10 @@ export const ColumnLookup =(inFrequency)=>
     return false;
 };
 
+
+
 /** @typedef {{Min:number, Max:number}} Limit */
+/** @typedef {(inValue:number, inLimit:Limit)=>number} LimitUse */
 /** @type {Record<string, Limit>} */
 export const ToneLimit =
 {
@@ -33,21 +36,26 @@ export const ToneLimit =
     Stim: { Min: -10, Max: 120 },
     Chan: { Min: 0,   Max: 1},
 };
-/** @type {(inValue:number, inLimit:Limit)=>number} */
-export const ApplyLimit =(inValue, inLimit)=>
+/** @type {LimitUse} */
+export const LimitCut =(inValue, inLimit)=>
 {
     if(inValue < inLimit.Min){ return inLimit.Min; }
     else if(inValue > inLimit.Max) { return inLimit.Max; }
     else{ return inValue; }
-}
-
-/** @typedef {(freq:TestFrequency, chan:number)=>TestFrequencySample|undefined} MarkLookup */
-/** @type {Record<string, MarkLookup>} */
-export const ChanMark =
-{
-    User: (freq, chan)=> chan == 0 ? freq.UserL : freq.UserR,
-    Test: (freq, chan)=> chan == 0 ? freq.TestL : freq.TestR
 };
+/** @type {LimitUse} */
+export const LimitMap =(inValue, inLimit)=>(inValue-inLimit.Min)/(inLimit.Max-inLimit.Min);
+
+
+
+
+/** @type {(freq:TestFrequency, chan:number, user:boolean)=>TestFrequencySample|undefined} */
+export const MarkGet =(freq, chan, user)=> freq[/** @type {"UserL"|"UserR"|"TestL"|"TestR"} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
+
+/** @type {(freq:TestFrequency, chan:number, mark:TestFrequencySample|undefined)=>TestFrequencySample|undefined} */
+export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
+
+
 
 
 /** @typedef {{Stim:number, Resp:boolean}} TestFrequencySample */
@@ -114,12 +122,54 @@ const Update =
         const freq = inState.Live.Freq;
         if(freq)
         {
-            inState.Live.Mark = inState.Chan == 0 ? freq.UserL : freq.UserR;
+            inState.Live.Mark = MarkGet(freq, inState.Chan, true);
             return true;
         }
         return false;
     }
 };
+
+
+/** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>Array<Array<{x:number, y:number}>>} */
+function Congtiguous(inTest, inChannel, inIsUser)
+{
+    const segments = [];
+    let plot;
+    /** @type {Array<{x:number, y:number}>} */
+    let segment = [];
+    let valid = false;
+    for(let i=0; i<inTest.Plot.length; i++)
+    {
+        plot = inTest.Plot[i];
+        const mark = MarkGet(plot, inChannel, inIsUser);
+        if(mark?.Resp)
+        {
+            if(!valid)
+            {
+                segment = [];
+                segments.push(segment);
+            }
+            valid = true;
+            const lookup = ColumnLookup(plot.Hz);
+            if(lookup)
+            {
+                segment.push(
+                    {
+                        x: lookup[1]*100,
+                        y: LimitMap(mark.Stim, ToneLimit.Stim)*100
+                    }
+                );
+            }
+        }
+        else
+        {
+            valid = false;
+        }
+    }
+    return segments;
+}
+
+
 /** @type {Reducer} */
 export function Reducer(inState, inAction)
 {
@@ -136,14 +186,12 @@ export function Reducer(inState, inAction)
     {
         if(clone.Live.Freq)
         {
-            const channelKey = clone.Chan == 0 ? "UserL" : "UserR";
-            const channelVal = Data !== null ? {Stim:clone.Stim, Resp:Data} : undefined;
-            clone.Live.Mark = clone.Live.Freq[channelKey] = channelVal;
+            clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan, Data !== null ? {Stim:clone.Stim, Resp:Data} : undefined);
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
     {
-        clone[Name] = ApplyLimit(Data, ToneLimit[Name]);
+        clone[Name] = LimitCut(Data, ToneLimit[Name]);
         if(Name != "Stim")
         {
             Update.Freq(clone);
