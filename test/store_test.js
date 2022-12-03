@@ -129,10 +129,11 @@ Deno.test("Store", async(t)=>
             ]
         }
 
-        const pieces = Congtiguous(model, 0, true);
-        assertEquals(pieces.length, 2);
-        assertEquals(pieces[0].length, 2);
-        assertEquals(pieces[1].length, 3);
+        const {Points, Paths} = Congtiguous(model, 0, true);
+        assertEquals(Points.length, 6);
+        assertEquals(Paths.length, 2);
+        assertEquals(Paths[0].length, 2);
+        assertEquals(Paths[1].length, 3);
     });
 
 });

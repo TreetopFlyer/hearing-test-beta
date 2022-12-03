@@ -47,8 +47,6 @@ export const LimitCut =(inValue, inLimit)=>
 export const LimitMap =(inValue, inLimit)=>(inValue-inLimit.Min)/(inLimit.Max-inLimit.Min);
 
 
-
-
 /** @type {(freq:TestFrequency, chan:number, user:boolean)=>TestFrequencySample|undefined} */
 export const MarkGet =(freq, chan, user)=> freq[/** @type {"UserL"|"UserR"|"TestL"|"TestR"} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
 
@@ -56,11 +54,9 @@ export const MarkGet =(freq, chan, user)=> freq[/** @type {"UserL"|"UserR"|"Test
 export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
 
 
-
-
 /** @typedef {{Stim:number, Resp:boolean}} TestFrequencySample */
 /** @typedef {{Hz:number, TestL:TestFrequencySample, TestR:TestFrequencySample, UserL?:TestFrequencySample, UserR?:TestFrequencySample}} TestFrequency */
-/** @typedef {{Name:string, Plot:Array<TestFrequency>}} Test */
+/** @typedef {{Name:string, Plot:Array<TestFrequency>, Draw?:DrawTest}} Test */
 /** @typedef {{Test?:Test, Freq?:TestFrequency, Mark?:TestFrequencySample}} Context */
 /** @typedef {{Chan:number, Freq:number, Stim:number, Live:Context, Tests:Array<Test>}} State */
 /** @type {State} */
@@ -129,44 +125,51 @@ const Update =
     }
 };
 
-
-/** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>Array<Array<{x:number, y:number}>>} */
+/** @typedef {{X:number, Y:number, Resp:boolean}} DrawPoint */
+/** @typedef {{Points:Array<DrawPoint>, Paths:Array<Array<DrawPoint>>}} DrawGroup */
+/** @typedef {{Left:DrawGroup, Right:DrawGroup}} DrawChart */
+/** @typedef {{User:DrawGroup, Test:DrawGroup}} DrawTest */
+/** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>DrawGroup} */
 export function Congtiguous(inTest, inChannel, inIsUser)
 {
-    const segments = [];
+    /** @type {DrawGroup} */
+    const output = {Points:[], Paths:[]};
+
     let plot;
-    /** @type {Array<{x:number, y:number}>} */
-    let segment = [];
     let valid = false;
+    /** @type {Array<DrawPoint>} */
+    let segment = [];
     for(let i=0; i<inTest.Plot.length; i++)
     {
         plot = inTest.Plot[i];
         const mark = MarkGet(plot, inChannel, inIsUser);
-        if(mark?.Resp)
+        if(mark)
         {
-            if(!valid)
-            {
-                segment = [];
-                segments.push(segment);
-            }
-            valid = true;
             const lookup = ColumnLookup(plot.Hz);
             if(lookup)
             {
-                segment.push(
+                /** @type {DrawPoint} */
+                const point = { X: lookup[1]*100, Y: LimitMap(mark?.Stim, ToneLimit.Stim)*100, Resp: mark.Resp};
+                output.Points.push(point);
+
+                if(mark.Resp)
+                {
+                    if(!valid)
                     {
-                        x: lookup[1]*100,
-                        y: LimitMap(mark.Stim, ToneLimit.Stim)*100
+                        segment = [];
+                        output.Paths.push(segment);
                     }
-                );
+                    valid = true;
+                    segment.push(point);
+                }
+                else
+                {
+                    valid = false;
+                }
             }
         }
-        else
-        {
-            valid = false;
-        }
     }
-    return segments;
+    return output;
 }
 
 
