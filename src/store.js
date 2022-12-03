@@ -131,7 +131,7 @@ const Update =
 
 
 /** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>Array<Array<{x:number, y:number}>>} */
-function Congtiguous(inTest, inChannel, inIsUser)
+export function Congtiguous(inTest, inChannel, inIsUser)
 {
     const segments = [];
     let plot;

@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
-import { Reducer, ColumnMapping } from "../src/store.js";
+import { Reducer, ColumnMapping, Congtiguous } from "../src/store.js";
 
 Deno.test("Store", async(t)=>
 {
@@ -113,5 +113,26 @@ Deno.test("Store", async(t)=>
             assertEquals(state.Live.Mark.Resp, false);
         });
     })
+
+    await t.step("Contiguous Lines", ()=>
+    {
+        /** @type {import("../src/store.js").Test} */
+        const model = {
+            Name:"",
+            Plot:[
+                {Hz: 500,  TestL: {Stim:30, Resp:true}, TestR: {Stim:35, Resp:true}, UserL:{Stim:20, Resp:true}},
+                {Hz: 1000, TestL: {Stim:40, Resp:true}, TestR: {Stim:45, Resp:true}, UserL:{Stim:30, Resp:true}},
+                {Hz: 2000, TestL: {Stim:40, Resp:true}, TestR: {Stim:45, Resp:true}, UserL:{Stim:30, Resp:false}},
+                {Hz: 3000, TestL: {Stim:30, Resp:true}, TestR: {Stim:35, Resp:true}, UserL:{Stim:20, Resp:true}},
+                {Hz: 4000, TestL: {Stim:40, Resp:true}, TestR: {Stim:45, Resp:true}, UserL:{Stim:30, Resp:true}},
+                {Hz: 4000, TestL: {Stim:50, Resp:true}, TestR: {Stim:55, Resp:true}, UserL:{Stim:40, Resp:true}}
+            ]
+        }
+
+        const pieces = Congtiguous(model, 0, true);
+        assertEquals(pieces.length, 2);
+        assertEquals(pieces[0].length, 2);
+        assertEquals(pieces[1].length, 3);
+    });
 
 });
