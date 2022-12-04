@@ -1,5 +1,5 @@
 {
-    "compilerOptions": {"types":["store.d.ts"]},
+    "compilerOptions": {"types":["/store.d.ts"]},
     "tasks":
     {
         "fs": "deno run -A --no-lock https://deno.land/std@0.166.0/http/file_server.ts",
