@@ -1,20 +1,19 @@
 //@ts-check
 import React from "https://esm.sh/preact@10.11.3/compat";
 import { html } from "https://esm.sh/htm@3.1.1/preact";
-import { ColumnMapping, ColumnLookup } from "./store.js";
+import { ColumnMapping } from "./store.js";
 
 /** @typedef {({children}:{children:React.ReactNode})=>JSX.Element} BasicElement */
 
-/** @type {({children, icon, light, disabled, inactive}:{children:React.ReactNode, icon?:JSX.Element, light:boolean, disabled:boolean, inactive:boolean})=>JSX.Element} */
-export function Button({children, icon, light, disabled, inactive})
+/** @type {({children, icon, light, disabled, inactive, onClick}:{children:React.ReactNode, icon?:JSX.Element, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void})=>JSX.Element} */
+export function Button({children, icon, light, disabled, inactive, onClick})
 {
-    const [LightGet, LightSet] = React.useState(light);
     const [FlashGet, FlashSet] = React.useState(0);
     const handleClick =()=>
     {
         if(inactive||disabled){ return; }
-        LightSet(!LightGet);
         FlashSet(FlashGet+1);
+        onClick();
     };
 
     return html`
@@ -30,7 +29,7 @@ export function Button({children, icon, light, disabled, inactive})
             <span class="relative">${icon}</span>
         </span>` }
         <span class="p-2 relative border-l(1 [#ffffff44])">
-            <span class="absolute shadow-glow-yellow-500 top-0 left-1/2 w-6 h-[6px] bg-white rounded-full translate(-x-1/2 -y-1/2) transition-all duration-500 ${LightGet ? "opacity-100" : "opacity-0 scale-y-0"}"></span>
+            <span class="absolute shadow-glow-yellow-500 top-0 left-1/2 w-6 h-[6px] bg-white rounded-full translate(-x-1/2 -y-1/2) transition-all duration-500 ${light ? "opacity-100" : "opacity-0 scale-y-0"}"></span>
             ${children}
         </span>
     </button>`;
@@ -45,7 +44,7 @@ export function Chart({children})
     ColumnMapping.forEach(([label, position, normal])=>
     {
         rules.push(html`
-        <span class="block absolute top-[-${inset}px] left-[${position}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 slate-400) ${!normal && "border-dashed"}">
+        <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 slate-400) ${!normal && "border-dashed"}">
             <span class="block absolute top-0 left-0 -translate-x-1/2 -translate-y-full pb-${normal ? 4 : 1}">${label}</span>
         </span>`);
     });

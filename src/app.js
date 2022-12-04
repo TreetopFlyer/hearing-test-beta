@@ -3,6 +3,12 @@ import * as TW   from "https://esm.sh/@twind/core@1.0.1";
 import TWPreTail from "https://esm.sh/@twind/preset-tailwind@1.0.1";
 import TWPreAuto from "https://esm.sh/@twind/preset-autoprefix@1.0.1";
 
+import * as UI from "./ui.js";
+import { Reducer, Initial } from "./store.js";
+import React from "https://esm.sh/preact@10.11.3/compat";
+import {html}    from "https://esm.sh/htm@3.1.1/preact";
+
+
 /** @type {TW.TwindConfig} */
 const Configure = {
     theme:
@@ -70,19 +76,39 @@ ShadowDOM.append(ShadowCSS);
 ShadowDOM.append(ShadowDiv);
 TW.observe(TW.twind(Configure, TW.cssom(ShadowCSS)), ShadowDiv);
 
-import * as UI from "./ui.js";
-import {render}  from "https://esm.sh/preact@10.11.3/compat";
-import {html}    from "https://esm.sh/htm@3.1.1/preact";
-render(html`
-    <${UI.Button} icon="+">hey!<//>
-    <${UI.Button} light>Left<//>
-    <${UI.Button} inactive>Right<//>
-    <${UI.Button} disabled>Right<//>
-    <${UI.Chart}>
-        <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
-            <${UI.Mark} right=${true}  x=${"20%"} y="20%" />
-            <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
-            <${UI.Mark} right=${false}/>
-        </svg>
+
+const StoreContext = React.createContext(null);
+const StoreProvider =(props)=>
+{
+    const reducer = React.useReducer(Reducer, Initial);
+    return html`<${StoreContext.Provider} value=${reducer}>${props.children}<//>`;
+}
+const StoreConsumer =()=> React.useContext(StoreContext);
+
+
+const Deep =()=>
+{
+    const [State, Dispatch] = React.useContext(StoreContext);
+    return html`
+    <${UI.Button} onClick=${()=>Dispatch({Name:"Stim", Data:5})}>
+        ${State.Stim}
+    <//>`;
+}
+
+React.render(html`
+    <${StoreProvider}>
+        <${UI.Button} icon="+">hey!<//>
+        <${UI.Button} light>Left<//>
+        <${UI.Button} inactive>Right<//>
+        <${UI.Button} disabled>Right<//>
+        <${Deep}/>
+        <${UI.Chart}>
+            <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
+                <${UI.Mark} right=${true}  x=${"20%"} y="20%" />
+                <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
+                <${UI.Mark} right=${false}/>
+                <line x1=${"10%"} y1=${"10%"} x2=${"50%"} y2=${"50%"} class="stroke-2 opacity-60" />
+            </svg>
+        <//>
     <//>
 `, ShadowDiv);

@@ -2,6 +2,7 @@
     "tasks":
     {
         "fs": "deno run -A --no-lock https://deno.land/std@0.166.0/http/file_server.ts",
-        "test": "deno test test/store_test.js --no-lock --watch"
+        "test": "deno test --no-lock --watch test/store_test.js",
+        "test-debug": "deno test --no-lock --inspect-brk test/store_test.js"
     }
 }

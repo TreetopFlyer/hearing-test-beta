@@ -56,9 +56,9 @@ export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = ma
 
 /** @typedef {{Stim:number, Resp:boolean}} TestFrequencySample */
 /** @typedef {{Hz:number, TestL:TestFrequencySample, TestR:TestFrequencySample, UserL?:TestFrequencySample, UserR?:TestFrequencySample}} TestFrequency */
-/** @typedef {{Name:string, Plot:Array<TestFrequency>, Draw?:DrawTest}} Test */
+/** @typedef {{Name:string, Plot:Array<TestFrequency>}} Test */
 /** @typedef {{Test?:Test, Freq?:TestFrequency, Mark?:TestFrequencySample}} Context */
-/** @typedef {{Chan:number, Freq:number, Stim:number, Live:Context, Tests:Array<Test>}} State */
+/** @typedef {{Chan:number, Freq:number, Stim:number, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State */
 /** @type {State} */
 export const Initial =
 {
@@ -71,6 +71,13 @@ export const Initial =
         Freq: undefined,
         Mark: undefined
     },
+    Draw:
+    {
+        UserL:{Points:[], Paths:[]},
+        UserR:{Points:[], Paths:[]},
+        TestL:{Points:[], Paths:[]},
+        TestR:{Points:[], Paths:[]}
+    },
     Tests: [
         {
             Name: "Patient A  Asymmetric Notch",
@@ -82,6 +89,34 @@ export const Initial =
         }
     ]
 };
+
+/*
+const minified =
+[
+    1,
+    [
+        [20, 30, 50, 40, 60, 80],[20, 30, 50, 40, 60, 80]
+    ]
+];
+const Expand =(inMin)=>
+{
+    const outTests = [];
+    const inFreq = inMin[0];
+    for(let i=1; i<inMin.length; i++)
+    {
+        let inTest = inMin[i];
+        let inTestName = inTest[0];
+
+        const outTest = {
+            Name:inTest[0],
+            Plot:[]
+        };
+        outTests.push(outTest);
+        const outFreq = {Hz:0, TestL:{Stim:0, Resp:true}, TestR:{Stim:0, Resp:true}, UserL:undefined, UserR:undefined};
+
+    }
+}
+*/
 
 /** @typedef {{Name:"Mark", Data:boolean|null}} ActionMark */
 /** @typedef {{Name:"Test", Data:number}} ActionTest */
@@ -125,10 +160,10 @@ const Update =
     }
 };
 
-/** @typedef {{X:number, Y:number, Resp:boolean}} DrawPoint */
+/** @typedef {{X:number, Y:number, Mark:TestFrequencySample}} DrawPoint */
 /** @typedef {{Points:Array<DrawPoint>, Paths:Array<Array<DrawPoint>>}} DrawGroup */
 /** @typedef {{Left:DrawGroup, Right:DrawGroup}} DrawChart */
-/** @typedef {{User:DrawGroup, Test:DrawGroup}} DrawTest */
+/** @typedef {{User?:DrawChart, Test?:DrawChart}} DrawTest */
 /** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>DrawGroup} */
 export function Congtiguous(inTest, inChannel, inIsUser)
 {
@@ -149,7 +184,11 @@ export function Congtiguous(inTest, inChannel, inIsUser)
             if(lookup)
             {
                 /** @type {DrawPoint} */
-                const point = { X: lookup[1]*100, Y: LimitMap(mark?.Stim, ToneLimit.Stim)*100, Resp: mark.Resp};
+                const point = {
+                    X: lookup[1]*100,
+                    Y: LimitMap(mark.Stim, ToneLimit.Stim)*100,
+                    Mark: mark
+                };
                 output.Points.push(point);
 
                 if(mark.Resp)
@@ -184,17 +223,26 @@ export function Reducer(inState, inAction)
         clone.Live.Test = clone.Tests[Data];
         Update.Freq(clone);
         Update.Mark(clone);
+        clone.Draw = {
+            UserL: Congtiguous(clone.Live.Test, 0, true ),
+            UserR: Congtiguous(clone.Live.Test, 1, true ),
+            TestL: Congtiguous(clone.Live.Test, 0, false),
+            TestR: Congtiguous(clone.Live.Test, 1, false)
+        };
     }
     else if (Name == "Mark")
     {
-        if(clone.Live.Freq)
+        if(clone.Live.Test && clone.Live.Freq)
         {
             clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan, Data !== null ? {Stim:clone.Stim, Resp:Data} : undefined);
+
+            clone.Draw = {...clone.Draw};
+            clone.Draw[clone.Chan == 0 ? "UserL" : "UserR"] = Congtiguous(clone.Live.Test, clone.Chan, true);
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
     {
-        clone[Name] = LimitCut(Data, ToneLimit[Name]);
+        clone[Name] = LimitCut(clone[Name]+Data, ToneLimit[Name]);
         if(Name != "Stim")
         {
             Update.Freq(clone);
