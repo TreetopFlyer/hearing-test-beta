@@ -37,7 +37,7 @@ export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = ma
 /** @typedef {{Hz:number, TestL:TestFrequencySample, TestR:TestFrequencySample, UserL?:TestFrequencySample, UserR?:TestFrequencySample}} TestFrequency */
 /** @typedef {{Name:string, Plot:Array<TestFrequency>}} Test */
 /** @typedef {{Test?:Test, Freq?:TestFrequency, Mark?:TestFrequencySample}} Context */
-/** @typedef {{Chan:Range, Freq:Range, Stim:Range, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State */
+/** @typedef {{Chan:Range, Freq:Range, Stim:Range, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State @memberof Store*/
 /** @type {State} */
 export const Initial =
 {

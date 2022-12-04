@@ -6,8 +6,12 @@ import TWPreAuto from "https://esm.sh/@twind/preset-autoprefix@1.0.1";
 import * as UI from "./ui.js";
 import { Reducer, Initial } from "./store.js";
 import React from "https://esm.sh/preact@10.11.3/compat";
-import {html}    from "https://esm.sh/htm@3.1.1/preact";
+import {html} from "https://esm.sh/htm@3.1.1/preact";
 
+/** @typedef {import("./store.js").State} State */
+/** @typedef {import("https://esm.sh/preact@10.11.3/compat").JSX.Element} JSX.Element */
+/** @typedef {import("./store.js").Action} Action */
+/** @type {JSX.Element} */
 
 /** @type {TW.TwindConfig} */
 const Configure = {
@@ -76,23 +80,40 @@ ShadowDOM.append(ShadowCSS);
 ShadowDOM.append(ShadowDiv);
 TW.observe(TW.twind(Configure, TW.cssom(ShadowCSS)), ShadowDiv);
 
+/** @type {import("https://esm.sh/v99/preact@10.11.3/src/index.js").Context<Binding>} */
+const StoreContext = React.createContext([Initial, (a)=>{}]);
 
-const StoreContext = React.createContext(null);
 const StoreProvider =(props)=>
 {
     const reducer = React.useReducer(Reducer, Initial);
     return html`<${StoreContext.Provider} value=${reducer}>${props.children}<//>`;
 }
+
+/** @typedef {[state:State, dispatch:(inAction:Action)=>void]} Binding */
+/** @type {()=>Binding} */
 const StoreConsumer =()=> React.useContext(StoreContext);
 
 
 const Deep =()=>
 {
-    const [State, Dispatch] = React.useContext(StoreContext);
+    const [State, Dispatch] = StoreConsumer();
     return html`
     <${UI.Button} onClick=${()=>Dispatch({Name:"Stim", Data:1})} disabled=${State.Stim.Value == State.Stim.Max}>
         ${State.Stim.Value}
     <//>`;
+}
+
+const Audiogram =()=>
+{
+    const [State, Dispatch] = StoreConsumer();
+    return html`
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
+        ${State.Draw}
+        <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
+        <${UI.Mark} right=${false}/>
+        <line x1=${"10%"} y1=${"10%"} x2=${"50%"} y2=${"50%"} class="stroke-2 opacity-60" />
+    </svg>
+    `;
 }
 
 React.render(html`
