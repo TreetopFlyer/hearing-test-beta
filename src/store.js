@@ -26,45 +26,24 @@ export const ColumnLookup =(inFrequency)=>
 };
 
 
-
-/** @typedef {{Min:number, Max:number}} Limit */
-/** @typedef {(inValue:number, inLimit:Limit)=>number} LimitUse */
-/** @type {Record<string, Limit>} */
-export const ToneLimit =
-{
-    Freq: { Min: 0,   Max: ColumnMapping.length-1 },
-    Stim: { Min: -10, Max: 120 },
-    Chan: { Min: 0,   Max: 1},
-};
-/** @type {LimitUse} */
-export const LimitCut =(inValue, inLimit)=>
-{
-    if(inValue < inLimit.Min){ return inLimit.Min; }
-    else if(inValue > inLimit.Max) { return inLimit.Max; }
-    else{ return inValue; }
-};
-/** @type {LimitUse} */
-export const LimitMap =(inValue, inLimit)=>(inValue-inLimit.Min)/(inLimit.Max-inLimit.Min);
-
-
 /** @type {(freq:TestFrequency, chan:number, user:boolean)=>TestFrequencySample|undefined} */
 export const MarkGet =(freq, chan, user)=> freq[/** @type {"UserL"|"UserR"|"TestL"|"TestR"} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
 
 /** @type {(freq:TestFrequency, chan:number, mark:TestFrequencySample|undefined)=>TestFrequencySample|undefined} */
 export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
 
-
+/** @typedef {{Min:number, Max:number, Value:number, Step:number}} Range */
 /** @typedef {{Stim:number, Resp:boolean}} TestFrequencySample */
 /** @typedef {{Hz:number, TestL:TestFrequencySample, TestR:TestFrequencySample, UserL?:TestFrequencySample, UserR?:TestFrequencySample}} TestFrequency */
 /** @typedef {{Name:string, Plot:Array<TestFrequency>}} Test */
 /** @typedef {{Test?:Test, Freq?:TestFrequency, Mark?:TestFrequencySample}} Context */
-/** @typedef {{Chan:number, Freq:number, Stim:number, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State */
+/** @typedef {{Chan:Range, Freq:Range, Stim:Range, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State */
 /** @type {State} */
 export const Initial =
 {
-    Chan: 0,
-    Freq: 3,
-    Stim: 30,
+    Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
+    Freq: { Min:2,   Max:8,   Value:2,  Step:1 },
+    Stim: { Min:-10, Max:120, Value:30, Step:5 },
     Live:
     {
         Test: undefined,
@@ -90,34 +69,6 @@ export const Initial =
     ]
 };
 
-/*
-const minified =
-[
-    1,
-    [
-        [20, 30, 50, 40, 60, 80],[20, 30, 50, 40, 60, 80]
-    ]
-];
-const Expand =(inMin)=>
-{
-    const outTests = [];
-    const inFreq = inMin[0];
-    for(let i=1; i<inMin.length; i++)
-    {
-        let inTest = inMin[i];
-        let inTestName = inTest[0];
-
-        const outTest = {
-            Name:inTest[0],
-            Plot:[]
-        };
-        outTests.push(outTest);
-        const outFreq = {Hz:0, TestL:{Stim:0, Resp:true}, TestR:{Stim:0, Resp:true}, UserL:undefined, UserR:undefined};
-
-    }
-}
-*/
-
 /** @typedef {{Name:"Mark", Data:boolean|null}} ActionMark */
 /** @typedef {{Name:"Test", Data:number}} ActionTest */
 /** @typedef {{Name:"Chan", Data:number}} ActionChan */
@@ -131,7 +82,7 @@ const Update =
 {
     Freq(inState)
     {
-        const column = ColumnMapping[inState.Freq];
+        const column = ColumnMapping[inState.Freq.Value];
         if(column && inState.Live.Test)
         {
             const hz = column[0];
@@ -153,7 +104,7 @@ const Update =
         const freq = inState.Live.Freq;
         if(freq)
         {
-            inState.Live.Mark = MarkGet(freq, inState.Chan, true);
+            inState.Live.Mark = MarkGet(freq, inState.Chan.Value, true);
             return true;
         }
         return false;
@@ -164,8 +115,8 @@ const Update =
 /** @typedef {{Points:Array<DrawPoint>, Paths:Array<Array<DrawPoint>>}} DrawGroup */
 /** @typedef {{Left:DrawGroup, Right:DrawGroup}} DrawChart */
 /** @typedef {{User?:DrawChart, Test?:DrawChart}} DrawTest */
-/** @type {(inTest:Test, inChannel:number, inIsUser:boolean)=>DrawGroup} */
-export function Congtiguous(inTest, inChannel, inIsUser)
+/** @type {(inTest:Test, inChan:number, inStim:Range, inIsUser:boolean)=>DrawGroup} */
+export function Congtiguous(inTest, inChan, inStim, inIsUser)
 {
     /** @type {DrawGroup} */
     const output = {Points:[], Paths:[]};
@@ -177,7 +128,7 @@ export function Congtiguous(inTest, inChannel, inIsUser)
     for(let i=0; i<inTest.Plot.length; i++)
     {
         plot = inTest.Plot[i];
-        const mark = MarkGet(plot, inChannel, inIsUser);
+        const mark = MarkGet(plot, inChan, inIsUser);
         if(mark)
         {
             const lookup = ColumnLookup(plot.Hz);
@@ -186,7 +137,7 @@ export function Congtiguous(inTest, inChannel, inIsUser)
                 /** @type {DrawPoint} */
                 const point = {
                     X: lookup[1]*100,
-                    Y: LimitMap(mark.Stim, ToneLimit.Stim)*100,
+                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min) * 100,
                     Mark: mark
                 };
                 output.Points.push(point);
@@ -224,25 +175,29 @@ export function Reducer(inState, inAction)
         Update.Freq(clone);
         Update.Mark(clone);
         clone.Draw = {
-            UserL: Congtiguous(clone.Live.Test, 0, true ),
-            UserR: Congtiguous(clone.Live.Test, 1, true ),
-            TestL: Congtiguous(clone.Live.Test, 0, false),
-            TestR: Congtiguous(clone.Live.Test, 1, false)
+            UserL: Congtiguous(clone.Live.Test, 0, clone.Stim, true ),
+            UserR: Congtiguous(clone.Live.Test, 1, clone.Stim, true ),
+            TestL: Congtiguous(clone.Live.Test, 0, clone.Stim, false),
+            TestR: Congtiguous(clone.Live.Test, 1, clone.Stim, false)
         };
     }
     else if (Name == "Mark")
     {
         if(clone.Live.Test && clone.Live.Freq)
         {
-            clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan, Data !== null ? {Stim:clone.Stim, Resp:Data} : undefined);
+            clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan.Value, Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined);
 
             clone.Draw = {...clone.Draw};
-            clone.Draw[clone.Chan == 0 ? "UserL" : "UserR"] = Congtiguous(clone.Live.Test, clone.Chan, true);
+            clone.Draw[clone.Chan.Value == 0 ? "UserL" : "UserR"] = Congtiguous(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
     {
-        clone[Name] = LimitCut(clone[Name]+Data, ToneLimit[Name]);
+        const tone = {...clone[Name]};
+        tone.Value += Data*tone.Step;
+        if(tone.Value < tone.Min){ tone.Value = tone.Min; }
+        if(tone.Value > tone.Max){ tone.Value = tone.Max; }
+        clone[Name] = tone;
         if(Name != "Stim")
         {
             Update.Freq(clone);
@@ -252,3 +207,31 @@ export function Reducer(inState, inAction)
 
     return clone;
 }
+
+/*
+const minified =
+[
+    1,
+    [
+        [20, 30, 50, 40, 60, 80],[20, 30, 50, 40, 60, 80]
+    ]
+];
+const Expand =(inMin)=>
+{
+    const outTests = [];
+    const inFreq = inMin[0];
+    for(let i=1; i<inMin.length; i++)
+    {
+        let inTest = inMin[i];
+        let inTestName = inTest[0];
+
+        const outTest = {
+            Name:inTest[0],
+            Plot:[]
+        };
+        outTests.push(outTest);
+        const outFreq = {Hz:0, TestL:{Stim:0, Resp:true}, TestR:{Stim:0, Resp:true}, UserL:undefined, UserR:undefined};
+
+    }
+}
+*/

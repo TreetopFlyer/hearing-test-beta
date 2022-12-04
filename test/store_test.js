@@ -1,38 +1,18 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
-import { Reducer, ColumnMapping, Congtiguous } from "../src/store.js";
+import { Reducer, ColumnMapping, Congtiguous, Initial } from "../src/store.js";
 
-let state = {
-    Chan: 0,
-    Freq: 1,
-    Stim: 20,
-    Live:
-    {
-        Test: undefined,
-        Freq: undefined,
-        Mark: undefined
-    },
-    Draw:
-    {
-        UserL:{Points:[], Paths:[]},
-        UserR:{Points:[], Paths:[]},
-        TestL:{Points:[], Paths:[]},
-        TestR:{Points:[], Paths:[]}
-    },
-    Tests: [
-        {
-            Name: "Patient A  Asymmetric Notch",
-            Plot:
-            [
-                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } }
-            ]
-        }
-    ]
-};
-
+let state = {...Initial};
 
 Deno.test("Initialize", async(t)=>
 {
+
+    await t.step("Tone Parameters Initialized", ()=>
+    {
+        assertEquals(state.Chan.Value, 0);
+        assertEquals(state.Freq.Value, 2);
+        assertEquals(state.Stim.Value, 30);
+    });
+
     await t.step("A test exists with 500 and 1k hz plots", ()=>
     {
         assertEquals(state.Tests.length > 0, true);
@@ -45,28 +25,38 @@ Deno.test("Initialize", async(t)=>
     await t.step("Dispatch Test, Freq, Stim, and Chan updates", ()=>
     {
         state = Reducer(state, {Name:"Test", Data:0});
-        state = Reducer(state, {Name:"Freq", Data:1});
-        state = Reducer(state, {Name:"Stim", Data:5});
+
         state = Reducer(state, {Name:"Chan", Data:1});
+        state = Reducer(state, {Name:"Freq", Data:1});
+        state = Reducer(state, {Name:"Stim", Data:1});
     });
 
     await t.step("Freq, Stim, and Chan have the correct values", ()=>
     {
-        assertEquals(state.Stim, 25);
-        assertEquals(state.Freq, 2);
-        assertEquals(state.Chan, 1);
+        assertEquals(state.Chan.Value, 1);
+        assertEquals(state.Freq.Value, 3);
+        assertEquals(state.Stim.Value, 35);
     });
 
     await t.step("Live context values are correct", ()=>
     {
         assertEquals(state.Live.Test, state.Tests[0]);
-        assertEquals(state.Live.Freq.Hz, ColumnMapping[state.Freq][0]);
+        assertEquals(state.Live.Freq.Hz, ColumnMapping[state.Freq.Value][0]);
         assertEquals(state.Live.Mark, undefined, "(User) Mark is undefined");
     });
 });
 
 Deno.test("Make Marks", async(t)=>
 {
+    let state = {...Initial};
+    
+    await t.step("Tone Parameters Initialized", ()=>
+    {
+        assertEquals(state.Chan.Value, 0);
+        assertEquals(state.Freq.Value, 2);
+        assertEquals(state.Stim.Value, 30);
+    });
+
     await t.step("Dispatch Mark create", ()=>
     {
         state = Reducer(state, {Name:"Mark", Data:true});
@@ -74,36 +64,18 @@ Deno.test("Make Marks", async(t)=>
 
     await t.step("Check marked value", ()=>
     {
-        assertEquals(state.Live.Freq.UserR !== undefined, true, `there will be a user mark for the right channel`);
-        assertEquals(state.Live.Freq.UserL === undefined, true, `the left channel user mark will be undefined`);
-        assertEquals(state.Live.Mark.Stim, state.Stim);
+        assertEquals(state.Live.Freq.UserL !== undefined, true, `there will be a user mark for the left channel`);
+        assertEquals(state.Live.Freq.UserR === undefined, true, `but not the right`);
+        assertEquals(state.Live.Mark.Stim, state.Stim.Value);
         assertEquals(state.Live.Mark.Resp, true);
-    });
-
-    await t.step("Dispatch Mark delete", ()=>
-    {
-        state = Reducer(state, {Name:"Mark", Data:null});
-    });
-
-    await t.step("Check marked value", ()=>
-    {
-        assertEquals(state.Live.Freq.UserR === undefined, true);
-        assertEquals(state.Live.Freq.UserL === undefined, true);
-        assertEquals(state.Live.Mark, undefined);
     });
 
     await t.step("Dispatch Freq, Stim, and Chan updates", ()=>
     {
+        state = Reducer(state, {Name:"Test", Data:0});
         state = Reducer(state, {Name:"Freq", Data:1});
-        state = Reducer(state, {Name:"Stim", Data:5});
-        state = Reducer(state, {Name:"Chan", Data:0});
-    });
-
-    await t.step("Live context values are correct", ()=>
-    {
-        assertEquals(state.Live.Test, state.Tests[0]);
-        assertEquals(state.Live.Freq.Hz, ColumnMapping[state.Freq][0]);
-        assertEquals(state.Live.Mark, undefined);
+        state = Reducer(state, {Name:"Stim", Data:1});
+        state = Reducer(state, {Name:"Chan", Data:1});
     });
 
     await t.step("Dispatch Mark create", ()=>
@@ -114,10 +86,19 @@ Deno.test("Make Marks", async(t)=>
     await t.step("Check marked value", ()=>
     {
         assertEquals(state.Live.Freq.UserR !== undefined, true, `there will be a user mark for the right channel`);
-        assertEquals(state.Live.Freq.UserL === undefined, true, `the left channel user mark will be undefined`);
-        assertEquals(state.Live.Mark.Stim, state.Stim);
+        assertEquals(state.Live.Freq.UserL !== undefined, true, `and the left`);
+        assertEquals(state.Live.Mark.Stim, state.Stim.Value);
         assertEquals(state.Live.Mark.Resp, false);
     });
+
+    await t.step("Live context values are correct", ()=>
+    {
+        assertEquals(state.Live.Test, state.Tests[0]);
+        assertEquals(state.Live.Freq.Hz, ColumnMapping[state.Freq.Value][0]);
+        assertEquals(state.Live.Mark.Stim, state.Stim.Value);
+    });
+
+    console.log(state.Draw);
 });
 
 Deno.test("Contiguous Lines", ()=>
@@ -135,7 +116,7 @@ Deno.test("Contiguous Lines", ()=>
         ]
     }
 
-    const {Points, Paths} = Congtiguous(model, 0, true);
+    const {Points, Paths} = Congtiguous(model, 0, Initial.Stim, true);
     assertEquals(Points.length, 6);
     assertEquals(Paths.length, 2);
     assertEquals(Paths[0].length, 2);

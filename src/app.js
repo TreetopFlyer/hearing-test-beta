@@ -90,8 +90,8 @@ const Deep =()=>
 {
     const [State, Dispatch] = React.useContext(StoreContext);
     return html`
-    <${UI.Button} onClick=${()=>Dispatch({Name:"Stim", Data:5})}>
-        ${State.Stim}
+    <${UI.Button} onClick=${()=>Dispatch({Name:"Stim", Data:1})} disabled=${State.Stim.Value == State.Stim.Max}>
+        ${State.Stim.Value}
     <//>`;
 }
 
