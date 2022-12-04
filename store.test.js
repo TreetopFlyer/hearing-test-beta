@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
-import { Reducer, ColumnMapping, Congtiguous, Initial } from "../src/store.js";
+import { Reducer, ColumnMapping, Congtiguous, Initial } from "./src/store.js";
 
 let state = {...Initial};
 
@@ -103,7 +103,7 @@ Deno.test("Make Marks", async(t)=>
 
 Deno.test("Contiguous Lines", ()=>
 {
-    /** @type {import("../src/store.js").Test} */
+    /** @type {Store.Test} */
     const model = {
         Name:"",
         Plot:[

@@ -1,9 +1,4 @@
 {
     "deno.enable": true,
-    "deno.unstable": true,
-    "deno.codeLens.testArgs": [
-        "--allow-all",
-        "--no-check",
-        "--no-lock"
-    ]
+    "deno.unstable": true
 }

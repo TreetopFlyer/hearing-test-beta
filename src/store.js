@@ -1,8 +1,5 @@
-//@ts-check
-
 const size = 1/6;
-/** @typedef {[frequency:number, position:number, normal:boolean]} ColumnMapping  */
-/** @type {Array<ColumnMapping>} */
+/** @type {Array<Store.ColumnMapping>} */
 export const ColumnMapping = [
     [ 125, size*0.0, true ],
     [ 250, size*1.0, true ],
@@ -14,7 +11,7 @@ export const ColumnMapping = [
     [6000, size*5.5, false],
     [8000, size*6.0, true ]
 ];
-/** @type {(inFrequency:number)=>ColumnMapping|false} */
+/** @type {(inFrequency:number)=>Store.ColumnMapping|false} */
 export const ColumnLookup =(inFrequency)=>
 {
     for(let i=0; i<ColumnMapping.length; i++)
@@ -26,19 +23,13 @@ export const ColumnLookup =(inFrequency)=>
 };
 
 
-/** @type {(freq:TestFrequency, chan:number, user:boolean)=>TestFrequencySample|undefined} */
-export const MarkGet =(freq, chan, user)=> freq[/** @type {"UserL"|"UserR"|"TestL"|"TestR"} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
+/** @type {(freq:Store.TestFrequency, chan:number, user:boolean)=>Store.TestFrequencySample|undefined} */
+export const MarkGet =(freq, chan, user)=> freq[/** @type {Store.PlotKey} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
 
-/** @type {(freq:TestFrequency, chan:number, mark:TestFrequencySample|undefined)=>TestFrequencySample|undefined} */
+/** @type {(freq:Store.TestFrequency, chan:number, mark:TestFrequencySample|undefined)=>Store.TestFrequencySample|undefined} */
 export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
 
-/** @typedef {{Min:number, Max:number, Value:number, Step:number}} Range */
-/** @typedef {{Stim:number, Resp:boolean}} TestFrequencySample */
-/** @typedef {{Hz:number, TestL:TestFrequencySample, TestR:TestFrequencySample, UserL?:TestFrequencySample, UserR?:TestFrequencySample}} TestFrequency */
-/** @typedef {{Name:string, Plot:Array<TestFrequency>}} Test */
-/** @typedef {{Test?:Test, Freq?:TestFrequency, Mark?:TestFrequencySample}} Context */
-/** @typedef {{Chan:Range, Freq:Range, Stim:Range, Live:Context, Draw:{UserL:DrawGroup, UserR:DrawGroup, TestL:DrawGroup, TestR:DrawGroup}, Tests:Array<Test>}} State @memberof Store*/
-/** @type {State} */
+/** @type {Store.State} */
 export const Initial =
 {
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
@@ -69,15 +60,7 @@ export const Initial =
     ]
 };
 
-/** @typedef {{Name:"Mark", Data:boolean|null}} ActionMark */
-/** @typedef {{Name:"Test", Data:number}} ActionTest */
-/** @typedef {{Name:"Chan", Data:number}} ActionChan */
-/** @typedef {{Name:"Freq", Data:number}} ActionFreq */
-/** @typedef {{Name:"Stim", Data:number}} ActionStim */
-/** @typedef {ActionMark|ActionTest|ActionChan|ActionFreq|ActionStim} Action */
-/** @typedef {(inState:State, inAction:Action)=>State} Reducer */
-/** @typedef {(inState:State)=>boolean} SelectionUpdater */
-/** @type {Record<string, SelectionUpdater>} */
+/** @type {Record<string, Store.ContextUpdater>} */
 const Update =
 {
     Freq(inState)
@@ -111,19 +94,16 @@ const Update =
     }
 };
 
-/** @typedef {{X:number, Y:number, Mark:TestFrequencySample}} DrawPoint */
-/** @typedef {{Points:Array<DrawPoint>, Paths:Array<Array<DrawPoint>>}} DrawGroup */
-/** @typedef {{Left:DrawGroup, Right:DrawGroup}} DrawChart */
-/** @typedef {{User?:DrawChart, Test?:DrawChart}} DrawTest */
-/** @type {(inTest:Test, inChan:number, inStim:Range, inIsUser:boolean)=>DrawGroup} */
+
+/** @type {(inTest:Store.Test, inChan:number, inStim:Range, inIsUser:boolean)=>Store.DrawGroup} */
 export function Congtiguous(inTest, inChan, inStim, inIsUser)
 {
-    /** @type {DrawGroup} */
+    /** @type {Store.DrawGroup} */
     const output = {Points:[], Paths:[]};
 
     let plot;
     let valid = false;
-    /** @type {Array<DrawPoint>} */
+    /** @type {Array<Store.DrawPoint>} */
     let segment = [];
     for(let i=0; i<inTest.Plot.length; i++)
     {
@@ -134,7 +114,7 @@ export function Congtiguous(inTest, inChan, inStim, inIsUser)
             const lookup = ColumnLookup(plot.Hz);
             if(lookup)
             {
-                /** @type {DrawPoint} */
+                /** @type {Store.DrawPoint} */
                 const point = {
                     X: lookup[1]*100,
                     Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min) * 100,
@@ -163,7 +143,7 @@ export function Congtiguous(inTest, inChan, inStim, inIsUser)
 }
 
 
-/** @type {Reducer} */
+/** @type {Store.Reducer} */
 export function Reducer(inState, inAction)
 {
     const clone = {...inState};
@@ -207,31 +187,3 @@ export function Reducer(inState, inAction)
 
     return clone;
 }
-
-/*
-const minified =
-[
-    1,
-    [
-        [20, 30, 50, 40, 60, 80],[20, 30, 50, 40, 60, 80]
-    ]
-];
-const Expand =(inMin)=>
-{
-    const outTests = [];
-    const inFreq = inMin[0];
-    for(let i=1; i<inMin.length; i++)
-    {
-        let inTest = inMin[i];
-        let inTestName = inTest[0];
-
-        const outTest = {
-            Name:inTest[0],
-            Plot:[]
-        };
-        outTests.push(outTest);
-        const outFreq = {Hz:0, TestL:{Stim:0, Resp:true}, TestR:{Stim:0, Resp:true}, UserL:undefined, UserR:undefined};
-
-    }
-}
-*/
