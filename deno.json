@@ -1,5 +1,7 @@
 {
     "compilerOptions": {"types":["/store.d.ts"]},
+    "lint": {"files": {"include": ["src/"]}},
+    "fmt": {"files": {"include": ["src/"]}},
     "tasks":
     {
         "fs": "deno run -A --no-lock https://deno.land/std@0.166.0/http/file_server.ts",

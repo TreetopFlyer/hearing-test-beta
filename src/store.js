@@ -116,8 +116,8 @@ export function Congtiguous(inTest, inChan, inStim, inIsUser)
             {
                 /** @type {Store.DrawPoint} */
                 const point = {
-                    X: lookup[1]*100,
-                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min) * 100,
+                    X: lookup[1],
+                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
                     Mark: mark
                 };
                 output.Points.push(point);

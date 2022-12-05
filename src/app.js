@@ -6,37 +6,30 @@ import {html} from "https://esm.sh/htm@3.1.1/preact";
 
 /** @type {preact.Context<Binding>} */
 const StoreContext = React.createContext([Initial, (_a)=>{}]);
-
-
 /** @type {(props:{children:preact.ComponentChildren})=>preact.VNode} */
 const StoreProvider =(props)=>
 {
-    const reducer = React.useReducer(Reducer, Initial);
+    const initialized = Reducer(Initial, {Name:"Test", Data:0})
+    const reducer = React.useReducer(Reducer, initialized);
     return html`<${StoreContext.Provider} value=${reducer}>${props.children}<//>`;
 }
-
 /** @typedef {[state:Store.State, dispatch:(inAction:Store.Action)=>void]} Binding */
 /** @type {()=>Binding} */
 const StoreConsumer =()=> React.useContext(StoreContext);
 
-const Deep =()=>
-{
-    const [State, Dispatch] = StoreConsumer();
-    return html`
-    <${UI.Button} onClick=${()=>Dispatch({Name:"Stim", Data:1})} disabled=${State.Stim.Value == State.Stim.Max}>
-        ${State.Stim.Value}
-    <//>`;
-}
-
 const Audiogram =()=>
 {
     const [State, Dispatch] = StoreConsumer();
+
+    const testL = State.Draw.TestL.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${false}/>`);
+    const testR = State.Draw.TestR.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${true} />`);
+    const userL = State.Draw.UserL.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${false}/>`);
+    const userR = State.Draw.UserR.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${true} />`);
+
     return html`
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
-        ${State.Draw}
-        <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
-        <${UI.Mark} right=${false}/>
-        <line x1=${"10%"} y1=${"10%"} x2=${"50%"} y2=${"50%"} class="stroke-2 opacity-60" />
+        ${testL}
+        ${testR}
     </svg>
     `;
 }
@@ -55,14 +48,8 @@ React.render(html`
         <${UI.Button} light>Left<//>
         <${UI.Button} inactive>Right<//>
         <${UI.Button} disabled>Right<//>
-        <${Deep}/>
         <${UI.Chart}>
-            <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
-                <${UI.Mark} right=${true}  x=${"20%"} y="20%" />
-                <${UI.Mark} right=${false} x=${"10%"} y="20%" response=${true} />
-                <${UI.Mark} right=${false}/>
-                <line x1=${"10%"} y1=${"10%"} x2=${"50%"} y2=${"50%"} class="stroke-2 opacity-60" />
-            </svg>
+            <${Audiogram}/>
         <//>
     <//>
 `, ShadowDiv);
