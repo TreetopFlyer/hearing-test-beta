@@ -1,11 +1,10 @@
-//@ts-check
 import React from "https://esm.sh/preact@10.11.3/compat";
 import { html } from "https://esm.sh/htm@3.1.1/preact";
 import { ColumnMapping } from "./store.js";
 
-/** @typedef {({children}:{children:React.ReactNode})=>JSX.Element} BasicElement */
+/** @typedef {({children}:{children?:preact.ComponentChildren})=>preact.VNode} BasicElement */
 
-/** @type {({children, icon, light, disabled, inactive, onClick}:{children:React.ReactNode, icon?:JSX.Element, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void})=>JSX.Element} */
+/** @type {({children, icon, light, disabled, inactive, onClick}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void})=>preact.VNode} */
 export function Button({children, icon, light, disabled, inactive, onClick})
 {
     const [FlashGet, FlashSet] = React.useState(0);
@@ -39,14 +38,15 @@ export function Button({children, icon, light, disabled, inactive, onClick})
 export function Chart({children})
 {
     const inset = 20;
-    /** @type {Array<JSX.Element>} */
+    /** @type {Array<preact.VNode>} */
     const rules = [];
     ColumnMapping.forEach(([label, position, normal])=>
     {
         rules.push(html`
         <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 slate-400) ${!normal && "border-dashed"}">
             <span class="block absolute top-0 left-0 -translate-x-1/2 -translate-y-full pb-${normal ? 4 : 1}">${label}</span>
-        </span>`);
+        </span>`
+        );
     });
 
     const dbMin = -10;
@@ -56,8 +56,8 @@ export function Chart({children})
         rules.push(html`
         <span class="block absolute  left-[-${inset}px]   top-[${((db-dbMin) / (dbMax-dbMin))*100}%]   h-0 w-[calc(100%+${inset*2}px)] border-b(${db == 0 ? "2 black" : "1 slate-400"})">
             <span class="block absolute top-0 left-0 -translate-x-full -translate-y-1/2 pr-2">${db}</span>
-        </span>
-        `);
+        </span>`
+        );
     }
     return html`
     <div class="relative w-full h-[600px] font(sans medium) text(xs)">
@@ -76,14 +76,13 @@ export function Chart({children})
                 </div>
             </div>
         </div>
-    </div>
-    `;
+    </div>`;
 }
 
 
 /** @type {Record<string, BasicElement>} */
 const Glyph = {
-    Arrow:({children})=> html`
+    Arrow:()=> html`
     <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="0%"   y2="0%"  ></line>
     <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="25%"  y2="100%"></line>
     <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="100%" y2="25%" ></line>`,
@@ -99,14 +98,13 @@ const Glyph = {
     <g style="transform: translate(-35.35%, 35.35%) rotate(96deg) scale(0.5);">${children}</g>`
 };
 
-/** @type {({right, response, x, y}:{right:boolean, response?:boolean, x:string|number, y:string|number})=>JSX.Element} */
-export function Mark({right, response, x, y})
+/** @type {({right, response, x, y}:{right:boolean, response?:boolean, x:number, y:number})=>preact.VNode} */
+export const Mark =({right, response, x, y})=>
 {
     return html`
-    <svg x=${x} y=${y} width="20" height="20" class="overflow-visible">
+    <svg x=${(x*100) + "%"} y=${(y*100) + "%"} width="20" height="20" class="overflow-visible">
         <${ right ? Glyph.O : Glyph.X }>
-            ${ !response && html`<${Glyph.Arrow}/>`  }
+            ${ !response && html`<${Glyph.Arrow}/>` }
         <//>
-    </svg>
-    `;
+    </svg>`;
 }
