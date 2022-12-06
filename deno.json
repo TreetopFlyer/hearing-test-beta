@@ -1,9 +1,9 @@
 {
-    "compilerOptions": {"types":["/store.d.ts"]},
+    "compilerOptions": {"types":["./store"], "checkJs": true},
     "tasks":
     {
         "fs": "deno run -A --no-lock https://deno.land/std@0.166.0/http/file_server.ts",
-        "test": "deno test --no-lock --watch store.test.js",
-        "test-debug": "deno test --no-lock --inspect-brk store.test.js"
+        "test": "deno test --no-lock --no-check --watch store.test.ts",
+        "test-debug": "deno test --no-lock --no-check --inspect-brk store.test.ts"
     }
 }

@@ -1,3 +1,5 @@
+import React from "https://esm.sh/preact@10.11.3/compat";
+
 const size = 1/6;
 /** @type {Array<Store.ColumnMapping>} */
 export const ColumnMapping = [
@@ -26,7 +28,7 @@ export const ColumnLookup =(inFrequency)=>
 /** @type {(freq:Store.TestFrequency, chan:number, user:boolean)=>Store.TestFrequencySample|undefined} */
 export const MarkGet =(freq, chan, user)=> freq[/** @type {Store.PlotKey} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
 
-/** @type {(freq:Store.TestFrequency, chan:number, mark:TestFrequencySample|undefined)=>Store.TestFrequencySample|undefined} */
+/** @type {(freq:Store.TestFrequency, chan:number, mark:Store.TestFrequencySample|undefined)=>Store.TestFrequencySample|undefined} */
 export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
 
 /** @type {Store.State} */
@@ -95,16 +97,13 @@ const Update =
 };
 
 
-/** @type {(inTest:Store.Test, inChan:number, inStim:Range, inIsUser:boolean)=>Store.DrawGroup} */
+/** @type {(inTest:Store.Test, inChan:number, inStim:Store.Range, inIsUser:boolean)=>Store.DrawGroup} */
 export function Congtiguous(inTest, inChan, inStim, inIsUser)
 {
     /** @type {Store.DrawGroup} */
     const output = {Points:[], Paths:[]};
 
     let plot;
-    let valid = false;
-    /** @type {Array<Store.DrawPoint>} */
-    let segment = [];
     for(let i=0; i<inTest.Plot.length; i++)
     {
         plot = inTest.Plot[i];
@@ -116,27 +115,21 @@ export function Congtiguous(inTest, inChan, inStim, inIsUser)
             {
                 /** @type {Store.DrawPoint} */
                 const point = {
-                    X: lookup[1]*100,
-                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min) * 100,
+                    X: lookup[1]*100 + "%",
+                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min) * 100 + "%",
                     Mark: mark
                 };
                 output.Points.push(point);
-
-                if(mark.Resp)
-                {
-                    if(!valid)
-                    {
-                        segment = [];
-                        output.Paths.push(segment);
-                    }
-                    valid = true;
-                    segment.push(point);
-                }
-                else
-                {
-                    valid = false;
-                }
             }
+        }
+    }
+    for(let i=1; i<output.Points.length; i++)
+    {
+        /** @type {Store.DrawLine} */
+        const line = {Head:output.Points[i-1], Tail:output.Points[i]};
+        if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
+        {
+            output.Paths.push(line);
         }
     }
     return output;
@@ -187,3 +180,17 @@ export function Reducer(inState, inAction)
 
     return clone;
 }
+
+
+/** @type {preact.Context<Store.Binding>} */
+export const Context = React.createContext([Initial, (_a)=>{}]);
+/** @type {(props:{children:preact.ComponentChildren})=>preact.VNode} */
+export const Provider =(props)=>
+{
+    const initialized = Reducer(Initial, {Name:"Test", Data:0});
+    /** @type {Store.Binding} */
+    const reducer = React.useReducer(Reducer, initialized);
+    return React.createElement(Context.Provider, {value:reducer, children:props.children});
+}
+/** @type {()=>Store.Binding} */
+export const Consumer =()=> React.useContext(Context);

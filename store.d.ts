@@ -47,8 +47,11 @@ declare namespace Store {
   type PlotKeyTest = "TestL" | "TestR";
   type PlotKey = PlotKeyUser | PlotKeyTest;
 
-  type DrawPoint = { X: number; Y: number; Mark: TestFrequencySample };
-  type DrawGroup = { Points: Array<DrawPoint>; Paths: Array<Array<DrawPoint>> };
+  type DrawPoint = { X: number|string; Y: number|string; Mark: TestFrequencySample };
+  type DrawLine = { Head:DrawPoint, Tail:DrawPoint};
+  type DrawGroup = { Points: Array<DrawPoint>; Paths: Array<DrawLine> };
   type DrawChart = { Left: DrawGroup; Right: DrawGroup };
   type DrawTest = { User?: DrawChart; Test?: DrawChart };
+
+  type Binding = [state:State, dispatch:(inAction:Action)=>void]
 }
