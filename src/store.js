@@ -55,8 +55,8 @@ export const Initial =
             Name: "Patient A  Asymmetric Notch",
             Plot:
             [
-                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } }
+                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true }, UserL: { Stim: 55, Resp: true }, UserR: { Stim: 50, Resp: true } },
+                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true }, UserL: { Stim: 50, Resp: true }, UserR: { Stim: 30, Resp: true } }
             ]
         }
     ]

@@ -32,7 +32,7 @@ export const Configure = {
             },
             strokeWidth:
             {
-                "bold": "3px"
+                "bold": "4px"
             }
         }
     },

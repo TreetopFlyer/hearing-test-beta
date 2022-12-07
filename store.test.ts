@@ -98,5 +98,11 @@ Deno.test("Make Marks", async(t)=>
         assertEquals(state.Live.Mark?.Stim, state.Stim.Value);
     });
 
+    await t.step("Check Draw output", ()=>
+    {
+        assertEquals(state.Draw.TestL.Points.length, 2);
+        assertEquals(state.Draw.TestL.Paths.length, 1);
+    });
+
     console.log(state.Draw);
 });

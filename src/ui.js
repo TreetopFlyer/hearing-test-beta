@@ -98,11 +98,11 @@ const Glyph = {
     <g style="transform: translate(-35.35%, 35.35%) rotate(96deg) scale(0.5);">${children}</g>`
 };
 
-/** @type {({right, response, x, y}:{right:boolean, response?:boolean, x:number, y:number})=>preact.VNode} */
-export const Mark =({right, response, x, y})=>
+/** @type {({right, response, x, y, classes}:{right:boolean, response?:boolean, x:number|string, y:number|string, classes:string})=>preact.VNode} */
+export const Mark =({right, response, x, y, classes})=>
 {
     return html`
-    <svg x=${(x*100) + "%"} y=${(y*100) + "%"} width="20" height="20" class="overflow-visible">
+    <svg x=${x} y=${y} width="20" height="20" class=${`overflow-visible ${classes}`}>
         <${ right ? Glyph.O : Glyph.X }>
             ${ !response && html`<${Glyph.Arrow}/>` }
         <//>

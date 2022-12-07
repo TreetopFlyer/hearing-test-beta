@@ -12,20 +12,29 @@ ShadowDOM.append(ShadowDiv);
 
 TW.Init(ShadowCSS, ShadowDiv);
 
+
+
 const Audiogram =()=>
 {
-    const [State, Dispatch] = Store.Consumer();
+    const [State] = Store.Consumer();
 
-    const testL = State.Draw.TestL.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${false}/>`);
-    const testR = State.Draw.TestR.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${true} />`);
-    const userL = State.Draw.UserL.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${false}/>`);
-    const userR = State.Draw.UserR.Points.map(p=>html`<${UI.Mark} x=${p.X} y=${p.Y} response=${p.Mark.Resp} right=${true} />`);
+    /** @type {(inAmount:number)=>string} */ const Perc =(inAmount)=> (inAmount*100)+"%";
+
+    const testMarksL = State.Draw.TestL.Points.map(p=>html`<${UI.Mark} x=${Perc(p.X)} y=${Perc(p.Y)} response=${p.Mark.Resp} right=${false}/>`);
+    const testMarksR = State.Draw.TestR.Points.map(p=>html`<${UI.Mark} x=${Perc(p.X)} y=${Perc(p.Y)} response=${p.Mark.Resp} right=${true} />`);
+    const testLinesL = State.Draw.TestL.Paths.map( p=>html`<line class="opacity-60" x1=${Perc(p.Head.X)} y1=${Perc(p.Head.Y)} x2=${Perc(p.Tail.X)} y2=${Perc(p.Tail.Y)} />`);
+    const testLinesR = State.Draw.TestR.Paths.map( p=>html`<line class="opacity-60" x1=${Perc(p.Head.X)} y1=${Perc(p.Head.Y)} x2=${Perc(p.Tail.X)} y2=${Perc(p.Tail.Y)} />`);
+
+    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${UI.Mark} x=${Perc(p.X)} y=${Perc(p.Y)} response=${p.Mark.Resp} right=${false}/>`);
+    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${UI.Mark} x=${Perc(p.X)} y=${Perc(p.Y)} response=${p.Mark.Resp} right=${true} />`);
+    const userLinesL = State.Draw.UserL.Paths.map( p=>html`<line class="opacity-60" x1=${Perc(p.Head.X)} y1=${Perc(p.Head.Y)} x2=${Perc(p.Tail.X)} y2=${Perc(p.Tail.Y)} />`);
+    const userLinesR = State.Draw.UserR.Paths.map( p=>html`<line class="opacity-60" x1=${Perc(p.Head.X)} y1=${Perc(p.Head.Y)} x2=${Perc(p.Tail.X)} y2=${Perc(p.Tail.Y)} />`);
 
     return html`
-    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw)">
-        ${testL}
-        ${testR}
-    </svg>`;
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw) opacity-50">${testMarksL}${testLinesL}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 bold draw)  opacity-50">${testMarksR}${testLinesR}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 2 draw)">${userMarksL}${userLinesL}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 2 draw)">${userMarksR}${userLinesR}</svg>`;
 };
 
 React.render(html`
