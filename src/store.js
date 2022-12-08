@@ -55,8 +55,13 @@ export const Initial =
             Name: "Patient A  Asymmetric Notch",
             Plot:
             [
-                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true }, UserL: { Stim: 55, Resp: true }, UserR: { Stim: 50, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true }, UserL: { Stim: 50, Resp: true }, UserR: { Stim: 30, Resp: true } }
+                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true } },
+                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+                { Hz: 2000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+                { Hz: 3000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+                { Hz: 4000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+                { Hz: 6000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+                { Hz: 8000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } }
             ]
         }
     ]
@@ -153,15 +158,16 @@ export function Reducer(inState, inAction)
             TestL: Congtiguous(clone.Live.Test, 0, clone.Stim, false),
             TestR: Congtiguous(clone.Live.Test, 1, clone.Stim, false)
         };
+        clone.Live = {...clone.Live};
     }
     else if (Name == "Mark")
     {
         if(clone.Live.Test && clone.Live.Freq)
         {
             clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan.Value, Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined);
-
-            clone.Draw = {...clone.Draw};
             clone.Draw[clone.Chan.Value == 0 ? "UserL" : "UserR"] = Congtiguous(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            clone.Live = {...clone.Live};
+            clone.Draw = {...clone.Draw};
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
@@ -175,6 +181,7 @@ export function Reducer(inState, inAction)
         {
             Update.Freq(clone);
             Update.Mark(clone);
+            clone.Live = {...clone.Live};
         }
     }
 

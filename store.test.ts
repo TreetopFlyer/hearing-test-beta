@@ -1,7 +1,34 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
 import { Reducer, ColumnMapping, Initial } from "./src/store.js";
 
-let state = {...Initial};
+let state:Store.State = {
+    Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
+    Freq: { Min:2,   Max:8,   Value:2,  Step:1 },
+    Stim: { Min:-10, Max:120, Value:30, Step:5 },
+    Live:
+    {
+        Test: undefined,
+        Freq: undefined,
+        Mark: undefined
+    },
+    Draw:
+    {
+        UserL:{Points:[], Paths:[]},
+        UserR:{Points:[], Paths:[]},
+        TestL:{Points:[], Paths:[]},
+        TestR:{Points:[], Paths:[]}
+    },
+    Tests: [
+        {
+            Name: "Patient A  Asymmetric Notch",
+            Plot:
+            [
+                { Hz: 500,  TestL: { Stim: 30, Resp: true }, TestR: { Stim: 50, Resp: true }, UserL: { Stim: 55, Resp: true }, UserR: { Stim: 50, Resp: true } },
+                { Hz: 1000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true }, UserL: { Stim: 50, Resp: true }, UserR: { Stim: 30, Resp: true } }
+            ]
+        }
+    ]
+};
 
 Deno.test("Initialize", async(t)=>
 {
