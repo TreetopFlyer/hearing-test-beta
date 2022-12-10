@@ -114,18 +114,19 @@ export function Reducer(inState, inAction)
             const key = clone.Chan.Value == 0 ? "UserL" : "UserR";
             clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
             clone.Live.Freq[key] = clone.Live.Mark;
-            clone.Live.Freq = {...clone.Live.Freq};
             clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
     {
-        const tone = {...clone[Name]};
+        const tone = clone[Name];
         tone.Value += Data*tone.Step;
         tone.Value = Math.max(tone.Value, tone.Min);
         tone.Value = Math.min(tone.Value, tone.Max);
-        clone[Name] = tone;
-        clone.Live = Reselect(clone);
+        if(Name != "Stim")
+        {
+            clone.Live = Reselect(clone);
+        }
     }
 
     return clone;

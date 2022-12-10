@@ -8,6 +8,7 @@ export const Configure = {
     {
         extend:
         {
+            // @ts-ignore: typings for keyframes are missing in twind
             keyframes:
             {
                 flash:
