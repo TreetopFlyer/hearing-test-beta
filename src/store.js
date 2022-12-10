@@ -28,8 +28,6 @@ export const ColumnLookup =(inFrequency)=>
 /** @type {(freq:Store.TestFrequency, chan:number, user:boolean)=>Store.TestFrequencySample|undefined} */
 export const MarkGet =(freq, chan, user)=> freq[/** @type {Store.PlotKey} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
 
-/** @type {(freq:Store.TestFrequency, chan:number, mark:Store.TestFrequencySample|undefined)=>Store.TestFrequencySample|undefined} */
-export const MarkSet =(freq, chan, mark)=> freq[ chan ? "UserR" : "UserL" ] = mark;
 
 /** @type {Store.State} */
 export const Initial =
@@ -67,74 +65,65 @@ export const Initial =
     ]
 };
 
-/** @type {Record<string, Store.ContextUpdater>} */
-const Update =
+
+/** @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
+const Reselect =(inState, inTest)=>
 {
-    Freq(inState)
+    /** @type {Store.Context} */
+    const output = { Test:inTest??inState.Live.Test };
+    const column = ColumnMapping[inState.Freq.Value];
+    if(column && inState.Live.Test)
     {
-        const column = ColumnMapping[inState.Freq.Value];
-        if(column && inState.Live.Test)
+        const hz = column[0];
+        for(let i=0; i<inState.Live.Test.Plot.length; i++)
         {
-            const hz = column[0];
-            inState.Live.Freq = undefined;
-            for(let i=0; i<inState.Live.Test.Plot.length; i++)
+            const plot = inState.Live.Test.Plot[i];
+            if(plot.Hz == hz)
             {
-                const plot = inState.Live.Test.Plot[i];
-                if(plot.Hz == hz)
-                {
-                    inState.Live.Freq = plot;
-                    return true;
-                }
+                output.Freq = plot;
+                output.Mark = plot[`User${inState.Chan.Value ? "R" : "L"}`];
             }
         }
-        return false;
-    },
-    Mark(inState)
-    {
-        const freq = inState.Live.Freq;
-        if(freq)
-        {
-            inState.Live.Mark = MarkGet(freq, inState.Chan.Value, true);
-            return true;
-        }
-        return false;
     }
+    return output;
 };
 
-
-/** @type {(inTest:Store.Test, inChan:number, inStim:Store.Range, inIsUser:boolean)=>Store.DrawGroup} */
-export function Congtiguous(inTest, inChan, inStim, inIsUser)
+/** @type {(inTest:Store.Test|undefined, inChan:number, inStim:Store.Range, inIsUser:boolean)=>Store.DrawGroup} */
+const Redraw =(inTest, inChan, inStim, inIsUser)=>
 {
     /** @type {Store.DrawGroup} */
     const output = {Points:[], Paths:[]};
 
-    let plot;
-    for(let i=0; i<inTest.Plot.length; i++)
+    if(inTest)
     {
-        plot = inTest.Plot[i];
-        const mark = MarkGet(plot, inChan, inIsUser);
-        if(mark)
+        let plot;
+        for(let i=0; i<inTest.Plot.length; i++)
         {
-            const lookup = ColumnLookup(plot.Hz);
-            if(lookup)
+            plot = inTest.Plot[i];
+            const mark = MarkGet(plot, inChan, inIsUser);
+            if(mark)
             {
-                /** @type {Store.DrawPoint} */
-                const point = {
-                    X: lookup[1],
-                    Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
-                    Mark: mark
-                };
-                output.Points.push(point);
+                const lookup = ColumnLookup(plot.Hz);
+                if(lookup)
+                {
+                    /** @type {Store.DrawPoint} */
+                    const point = {
+                        X: lookup[1],
+                        Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
+                        Mark: mark
+                    };
+                    output.Points.push(point);
+                }
             }
         }
-    }
-    for(let i=1; i<output.Points.length; i++)
-    {
-        /** @type {Store.DrawLine} */
-        const line = {Head:output.Points[i-1], Tail:output.Points[i]};
-        if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
+        for(let i=1; i<output.Points.length; i++)
         {
-            output.Paths.push(line);
+            /** @type {Store.DrawLine} */
+            const line = {Head:output.Points[i-1], Tail:output.Points[i]};
+            if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
+            {
+                output.Paths.push(line);
+            }
         }
     }
     return output;
@@ -149,24 +138,27 @@ export function Reducer(inState, inAction)
 
     if(Name == "Test")
     {
-        clone.Live.Test = clone.Tests[Data];
-        Update.Freq(clone);
-        Update.Mark(clone);
+        const test = clone.Tests[Data];
+        clone.Live = Reselect(clone, test);
         clone.Draw = {
-            UserL: Congtiguous(clone.Live.Test, 0, clone.Stim, true ),
-            UserR: Congtiguous(clone.Live.Test, 1, clone.Stim, true ),
-            TestL: Congtiguous(clone.Live.Test, 0, clone.Stim, false),
-            TestR: Congtiguous(clone.Live.Test, 1, clone.Stim, false)
+            UserL: Redraw(test, 0, clone.Stim, true ),
+            UserR: Redraw(test, 1, clone.Stim, true ),
+            TestL: Redraw(test, 0, clone.Stim, false),
+            TestR: Redraw(test, 1, clone.Stim, false)
         };
-        clone.Live = {...clone.Live};
     }
     else if (Name == "Mark")
     {
         if(clone.Live.Test && clone.Live.Freq)
         {
-            clone.Live.Mark = MarkSet(clone.Live.Freq, clone.Chan.Value, Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined);
-            clone.Draw[clone.Chan.Value == 0 ? "UserL" : "UserR"] = Congtiguous(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            const key = clone.Chan.Value == 0 ? "UserL" : "UserR";
+
+            clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
+            clone.Live.Freq[key] = clone.Live.Mark;
+            clone.Live.Freq = {...clone.Live.Freq};
             clone.Live = {...clone.Live};
+            
+            clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
             clone.Draw = {...clone.Draw};
         }
     }
@@ -179,9 +171,7 @@ export function Reducer(inState, inAction)
         clone[Name] = tone;
         if(Name != "Stim")
         {
-            Update.Freq(clone);
-            Update.Mark(clone);
-            clone.Live = {...clone.Live};
+            clone.Live = Reselect(clone);
         }
     }
 

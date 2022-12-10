@@ -64,7 +64,19 @@ const Audiogram =()=>
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw) opacity-50">${testMarksL}${testLinesL}</svg>
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 bold draw)  opacity-50">${testMarksR}${testLinesR}</svg>
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 2 draw)">${userMarksL}${userLinesL}</svg>
-    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 2 draw)">${userMarksR}${userLinesR}</svg>`;
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 2 draw)">${userMarksR}${userLinesR}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible" >
+        <ellipse cx="0" cy="0" rx="5" ry="30" fill="url(#glow)"></ellipse>
+        <ellipse cx="0" cy="0" rx="30" ry="5" fill="url(#glow)"></ellipse>
+        <defs>
+            <radialGradient id="glow">
+                <stop stop-color="blue" stop-opacity="0.6" offset="0.0"></stop>
+                <stop stop-color="blue" stop-opacity="0.3" offset="0.2"></stop>
+                <stop stop-color="blue" stop-opacity="0.0" offset="1.0"></stop>
+            </radialGradient>
+        </defs>
+    </svg>
+    `;
 };
 
 React.render(html`
