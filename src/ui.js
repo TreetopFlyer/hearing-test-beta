@@ -1,6 +1,7 @@
 import React from "react";
 import { html } from "htm";
 import * as Store from "./store.js";
+import * as Tone from "./tone.js";
 
 /** @typedef {({children}:{children?:preact.ComponentChildren})=>preact.VNode} BasicElement */
 
@@ -55,6 +56,8 @@ export const Controls =()=>
 {
     const [State, Dispatch] = Store.Consumer();
 
+    const {Play} = Tone.useTone();
+
     return html`
     <div class="flex">
         <div>Channel</div>
@@ -79,6 +82,10 @@ export const Controls =()=>
         <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:true })}>Response<//>
         <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:false})}>No Response<//>
         <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:null })} disabled=${State.Live.Mark == undefined}>Clear<//>
+    </div>
+    <div class="flex">
+        <div>Play</div>
+        <${Button} onClick=${Play}>continuous<//>
     </div>
     `;
 };
