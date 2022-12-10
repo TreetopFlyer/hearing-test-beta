@@ -25,6 +25,9 @@ export const ColumnLookup =(inFrequency)=>
     return false;
 };
 
+/** @type {(inDecimal:number)=>string} */
+const Perc =(inDecimal)=> `${inDecimal*100}%`;
+
 /** Creates a new Store.Context object that contain the current selections 
  * @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
 const Reselect =(inState, inTest)=>
@@ -69,8 +72,8 @@ const Redraw =(inTest, inChan, inStim, inIsUser)=>
                 {
                     /** @type {Store.DrawPoint} */
                     const point = {
-                        X: lookup[1],
-                        Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
+                        X: Perc(lookup[1]),
+                        Y: Perc((mark.Stim - inStim.Min)/(inStim.Max - inStim.Min)),
                         Mark: mark
                     };
                     output.Points.push(point);
@@ -81,14 +84,21 @@ const Redraw =(inTest, inChan, inStim, inIsUser)=>
         {
             /** @type {Store.DrawLine} */
             const line = {Head:output.Points[i-1], Tail:output.Points[i]};
-            if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
+            if(line.Head.Mark?.Resp && line.Tail.Mark?.Resp)
             {
                 output.Paths.push(line);
             }
         }
     }
     return output;
-}
+};
+
+/** Create a new cursor position from the state
+ * @type {(inState:Store.State)=>Store.DrawPoint} */
+const Reposition =(inState)=> ({
+    X: Perc(ColumnMapping[inState.Freq.Value][1]),
+    Y: Perc((inState.Stim.Value - inState.Stim.Min)/(inState.Stim.Max - inState.Stim.Min))
+});
 
 /** @type {Store.Reducer} */
 export function Reducer(inState, inAction)
@@ -100,7 +110,9 @@ export function Reducer(inState, inAction)
     {
         const test = clone.Tests[Data];
         clone.Live = Reselect(clone, test);
-        clone.Draw = {
+        clone.Draw =
+        {
+            Cross: Reposition(clone),
             UserL: Redraw(test, 0, clone.Stim, true ),
             UserR: Redraw(test, 1, clone.Stim, true ),
             TestL: Redraw(test, 0, clone.Stim, false),
@@ -123,6 +135,8 @@ export function Reducer(inState, inAction)
         tone.Value += Data*tone.Step;
         tone.Value = Math.max(tone.Value, tone.Min);
         tone.Value = Math.min(tone.Value, tone.Max);
+
+        clone.Draw.Cross = Reposition(clone);
         if(Name != "Stim")
         {
             clone.Live = Reselect(clone);
@@ -133,7 +147,7 @@ export function Reducer(inState, inAction)
 }
 
 /** @type {Store.State} */
-export const Initial =
+export const Initial = Reducer(
 {
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
     Freq: { Min:2,   Max:8,   Value:2,  Step:1 },
@@ -166,7 +180,7 @@ export const Initial =
             ]
         }
     ]
-};
+}, {Name:"Test", Data:0});
 
 /** @type {preact.Context<Store.Binding>} */
 export const Context = React.createContext([Initial, (_a)=>{}]);
@@ -175,7 +189,7 @@ export const Context = React.createContext([Initial, (_a)=>{}]);
 export const Provider =(props)=>
 {
     /** @type {Store.Binding} */
-    const reducer = React.useReducer(Reducer, Initial, ()=>Reducer(Initial, {Name:"Test", Data:0}));
+    const reducer = React.useReducer(Reducer, Initial);
     return React.createElement(Context.Provider, {value:reducer, children:props.children});
 };
 
