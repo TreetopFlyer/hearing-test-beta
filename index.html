@@ -1,4 +1,7 @@
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<!---->
 <div id="app"></div>
-<script type="module" src="src/app.js"></script>
+<script type="importmap-shim" src="./deno.map.json"></script>
+<script type="module-shim">import "app";</script>
+<script async src="https://unpkg.com/es-module-shims@0.13.1/dist/es-module-shims.min.js"></script>

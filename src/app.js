@@ -1,8 +1,8 @@
+import React from "react";
+import {html} from "htm";
 import * as TW from "./twind.js";
 import * as UI from "./ui.js";
 import * as Store from "./store.js";
-import React from "https://esm.sh/preact@10.11.3/compat";
-import {html} from "https://esm.sh/htm@3.1.1/preact";
 
 const ShadowDOM = document.querySelector("#app").attachShadow({mode: "open"});
 const ShadowDiv = document.createElement("div");

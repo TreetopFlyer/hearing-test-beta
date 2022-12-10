@@ -1,6 +1,6 @@
-import * as TW   from "https://esm.sh/@twind/core@1.0.1";
-import TWPreTail from "https://esm.sh/@twind/preset-tailwind@1.0.1";
-import TWPreAuto from "https://esm.sh/@twind/preset-autoprefix@1.0.1";
+import * as TW   from "@twind/core@1.0.1";
+import TWPreTail from "@twind/preset-tailwind@1.0.1";
+import TWPreAuto from "@twind/preset-autoprefix@1.0.1";
 
 /** @type {TW.TwindConfig} */
 export const Configure = {

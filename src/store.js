@@ -1,4 +1,4 @@
-import React from "https://esm.sh/preact@10.11.3/compat";
+import React from "react";
 
 const size = 1/6;
 /** @type {Array<Store.ColumnMapping>} */
