@@ -13,7 +13,8 @@ export const ColumnMapping = [
     [6000, size*5.5, false],
     [8000, size*6.0, true ]
 ];
-/** @type {(inFrequency:number)=>Store.ColumnMapping|false} */
+/** Looks up a frequency in ColumnMapping
+ *  @type {(inFrequency:number)=>Store.ColumnMapping|false} */
 export const ColumnLookup =(inFrequency)=>
 {
     for(let i=0; i<ColumnMapping.length; i++)
@@ -24,10 +25,111 @@ export const ColumnLookup =(inFrequency)=>
     return false;
 };
 
+/** Creates a new Store.Context object that contain the current selections 
+ * @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
+const Reselect =(inState, inTest)=>
+{
+    /** @type {Store.Context} */
+    const output = { Test:inTest??inState.Live.Test };
+    const column = ColumnMapping[inState.Freq.Value];
+    if(column && output.Test)
+    {
+        const hz = column[0];
+        for(let i=0; i<output.Test.Plot.length; i++)
+        {
+            const plot = output.Test.Plot[i];
+            if(plot.Hz == hz)
+            {
+                output.Freq = plot;
+                output.Mark = plot[`User${inState.Chan.Value ? "R" : "L"}`];
+            }
+        }
+    }
+    return output;
+};
 
-/** @type {(freq:Store.TestFrequency, chan:number, user:boolean)=>Store.TestFrequencySample|undefined} */
-export const MarkGet =(freq, chan, user)=> freq[/** @type {Store.PlotKey} */ (`${user ? "User" : "Test"}${chan ? "R" : "L"}`)];
+/** Creates a new Store.DrawGroup object for the given Test and settings
+ * @type {(inTest:Store.Test|undefined, inChan:number, inStim:Store.Range, inIsUser:boolean)=>Store.DrawGroup} */
+const Redraw =(inTest, inChan, inStim, inIsUser)=>
+{
+    /** @type {Store.DrawGroup} */
+    const output = {Points:[], Paths:[]};
 
+    if(inTest)
+    {
+        let plot;
+        for(let i=0; i<inTest.Plot.length; i++)
+        {
+            plot = inTest.Plot[i];
+            const mark = plot[`${inIsUser ? "User" : "Test"}${inChan ? "R" : "L"}`]
+            if(mark)
+            {
+                const lookup = ColumnLookup(plot.Hz);
+                if(lookup)
+                {
+                    /** @type {Store.DrawPoint} */
+                    const point = {
+                        X: lookup[1],
+                        Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
+                        Mark: mark
+                    };
+                    output.Points.push(point);
+                }
+            }
+        }
+        for(let i=1; i<output.Points.length; i++)
+        {
+            /** @type {Store.DrawLine} */
+            const line = {Head:output.Points[i-1], Tail:output.Points[i]};
+            if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
+            {
+                output.Paths.push(line);
+            }
+        }
+    }
+    return output;
+}
+
+/** @type {Store.Reducer} */
+export function Reducer(inState, inAction)
+{
+    const clone = {...inState};
+    const {Name, Data} = inAction;
+
+    if(Name == "Test")
+    {
+        const test = clone.Tests[Data];
+        clone.Live = Reselect(clone, test);
+        clone.Draw = {
+            UserL: Redraw(test, 0, clone.Stim, true ),
+            UserR: Redraw(test, 1, clone.Stim, true ),
+            TestL: Redraw(test, 0, clone.Stim, false),
+            TestR: Redraw(test, 1, clone.Stim, false)
+        };
+    }
+    else if (Name == "Mark")
+    {
+        if(clone.Live.Test && clone.Live.Freq)
+        {
+            const key = clone.Chan.Value == 0 ? "UserL" : "UserR";
+            clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
+            clone.Live.Freq[key] = clone.Live.Mark;
+            clone.Live.Freq = {...clone.Live.Freq};
+            clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+        }
+    }
+    else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
+    {
+        const tone = {...clone[Name]};
+        tone.Value += Data*tone.Step;
+        tone.Value = Math.max(tone.Value, tone.Min);
+        tone.Value = Math.min(tone.Value, tone.Max);
+        clone[Name] = tone;
+        clone.Live = Reselect(clone);
+    }
+
+    return clone;
+}
 
 /** @type {Store.State} */
 export const Initial =
@@ -65,129 +167,16 @@ export const Initial =
     ]
 };
 
-
-/** @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
-const Reselect =(inState, inTest)=>
-{
-    /** @type {Store.Context} */
-    const output = { Test:inTest??inState.Live.Test };
-    const column = ColumnMapping[inState.Freq.Value];
-    if(column && inState.Live.Test)
-    {
-        const hz = column[0];
-        for(let i=0; i<inState.Live.Test.Plot.length; i++)
-        {
-            const plot = inState.Live.Test.Plot[i];
-            if(plot.Hz == hz)
-            {
-                output.Freq = plot;
-                output.Mark = plot[`User${inState.Chan.Value ? "R" : "L"}`];
-            }
-        }
-    }
-    return output;
-};
-
-/** @type {(inTest:Store.Test|undefined, inChan:number, inStim:Store.Range, inIsUser:boolean)=>Store.DrawGroup} */
-const Redraw =(inTest, inChan, inStim, inIsUser)=>
-{
-    /** @type {Store.DrawGroup} */
-    const output = {Points:[], Paths:[]};
-
-    if(inTest)
-    {
-        let plot;
-        for(let i=0; i<inTest.Plot.length; i++)
-        {
-            plot = inTest.Plot[i];
-            const mark = MarkGet(plot, inChan, inIsUser);
-            if(mark)
-            {
-                const lookup = ColumnLookup(plot.Hz);
-                if(lookup)
-                {
-                    /** @type {Store.DrawPoint} */
-                    const point = {
-                        X: lookup[1],
-                        Y: (mark.Stim - inStim.Min)/(inStim.Max - inStim.Min),
-                        Mark: mark
-                    };
-                    output.Points.push(point);
-                }
-            }
-        }
-        for(let i=1; i<output.Points.length; i++)
-        {
-            /** @type {Store.DrawLine} */
-            const line = {Head:output.Points[i-1], Tail:output.Points[i]};
-            if(line.Head.Mark.Resp && line.Tail.Mark.Resp)
-            {
-                output.Paths.push(line);
-            }
-        }
-    }
-    return output;
-}
-
-
-/** @type {Store.Reducer} */
-export function Reducer(inState, inAction)
-{
-    const clone = {...inState};
-    const {Name, Data} = inAction;
-
-    if(Name == "Test")
-    {
-        const test = clone.Tests[Data];
-        clone.Live = Reselect(clone, test);
-        clone.Draw = {
-            UserL: Redraw(test, 0, clone.Stim, true ),
-            UserR: Redraw(test, 1, clone.Stim, true ),
-            TestL: Redraw(test, 0, clone.Stim, false),
-            TestR: Redraw(test, 1, clone.Stim, false)
-        };
-    }
-    else if (Name == "Mark")
-    {
-        if(clone.Live.Test && clone.Live.Freq)
-        {
-            const key = clone.Chan.Value == 0 ? "UserL" : "UserR";
-
-            clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
-            clone.Live.Freq[key] = clone.Live.Mark;
-            clone.Live.Freq = {...clone.Live.Freq};
-            clone.Live = {...clone.Live};
-            
-            clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
-            clone.Draw = {...clone.Draw};
-        }
-    }
-    else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
-    {
-        const tone = {...clone[Name]};
-        tone.Value += Data*tone.Step;
-        if(tone.Value < tone.Min){ tone.Value = tone.Min; }
-        if(tone.Value > tone.Max){ tone.Value = tone.Max; }
-        clone[Name] = tone;
-        if(Name != "Stim")
-        {
-            clone.Live = Reselect(clone);
-        }
-    }
-
-    return clone;
-}
-
-
 /** @type {preact.Context<Store.Binding>} */
 export const Context = React.createContext([Initial, (_a)=>{}]);
+
 /** @type {(props:{children:preact.ComponentChildren})=>preact.VNode} */
 export const Provider =(props)=>
 {
-    const initialized = Reducer(Initial, {Name:"Test", Data:0});
     /** @type {Store.Binding} */
-    const reducer = React.useReducer(Reducer, initialized);
+    const reducer = React.useReducer(Reducer, Initial, ()=>Reducer(Initial, {Name:"Test", Data:0}));
     return React.createElement(Context.Provider, {value:reducer, children:props.children});
-}
+};
+
 /** @type {()=>Store.Binding} */
 export const Consumer =()=> React.useContext(Context);

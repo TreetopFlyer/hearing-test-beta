@@ -25,12 +25,7 @@ declare namespace Store {
     Freq: Range;
     Stim: Range;
     Live: Context;
-    Draw: {
-      UserL: DrawGroup;
-      UserR: DrawGroup;
-      TestL: DrawGroup;
-      TestR: DrawGroup;
-    };
+    Draw: DrawTest;
     Tests: Array<Test>;
   };
 
@@ -50,8 +45,7 @@ declare namespace Store {
   type DrawPoint = { X: number; Y: number; Mark: TestFrequencySample };
   type DrawLine = { Head:DrawPoint, Tail:DrawPoint};
   type DrawGroup = { Points: Array<DrawPoint>; Paths: Array<DrawLine> };
-  type DrawChart = { Left: DrawGroup; Right: DrawGroup };
-  type DrawTest = { User?: DrawChart; Test?: DrawChart };
+  type DrawTest = { UserL: DrawGroup, UserR: DrawGroup, TestL: DrawGroup, TestR: DrawGroup };
 
   type Binding = [state:State, dispatch:(inAction:Action)=>void]
 }
