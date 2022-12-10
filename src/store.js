@@ -108,16 +108,20 @@ export function Reducer(inState, inAction)
 
     if(Name == "Test")
     {
-        const test = clone.Tests[Data];
-        clone.Live = Reselect(clone, test);
-        clone.Draw =
+        const test = clone.Test[Data];
+        if(test)
         {
-            Cross: Reposition(clone),
-            UserL: Redraw(test, 0, clone.Stim, true ),
-            UserR: Redraw(test, 1, clone.Stim, true ),
-            TestL: Redraw(test, 0, clone.Stim, false),
-            TestR: Redraw(test, 1, clone.Stim, false)
-        };
+            clone.TestIndex = Data;
+            clone.Live = Reselect(clone, test);
+            clone.Draw =
+            {
+                Cross: Reposition(clone),
+                UserL: Redraw(test, 0, clone.Stim, true ),
+                UserR: Redraw(test, 1, clone.Stim, true ),
+                TestL: Redraw(test, 0, clone.Stim, false),
+                TestR: Redraw(test, 1, clone.Stim, false)
+            };
+        }
     }
     else if (Name == "Mark")
     {
@@ -165,7 +169,8 @@ export const Initial = Reducer(
         TestL:{Points:[], Paths:[]},
         TestR:{Points:[], Paths:[]}
     },
-    Tests: [
+    TestIndex: 0,
+    Test: [
         {
             Name: "Patient A  Asymmetric Notch",
             Plot:
@@ -177,6 +182,19 @@ export const Initial = Reducer(
                 { Hz: 4000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
                 { Hz: 6000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
                 { Hz: 8000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } }
+            ]
+        },
+        {
+            Name: "Patient B  Asymmetric Notch",
+            Plot:
+            [
+                { Hz: 500,  TestL: { Stim: 50, Resp: true }, TestR: { Stim: 70, Resp: true } },
+                { Hz: 1000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } },
+                { Hz: 2000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } },
+                { Hz: 3000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } },
+                { Hz: 4000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } },
+                { Hz: 6000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } },
+                { Hz: 8000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 25, Resp: true } }
             ]
         }
     ]

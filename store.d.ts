@@ -26,7 +26,8 @@ declare namespace Store {
     Stim: Range;
     Live: Context;
     Draw: DrawChart;
-    Tests: Array<Test>;
+    TestIndex: number;
+    Test: Array<Test>;
   };
 
   type ActionMark = { Name: "Mark"; Data: boolean | null };

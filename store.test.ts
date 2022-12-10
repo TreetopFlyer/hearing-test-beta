@@ -18,7 +18,7 @@ let state:Store.State = {
         TestL:{Points:[], Paths:[]},
         TestR:{Points:[], Paths:[]}
     },
-    Tests: [
+    Test: [
         {
             Name: "Patient A  Asymmetric Notch",
             Plot:
@@ -42,8 +42,8 @@ Deno.test("Initialize", async(t)=>
 
     await t.step("A test exists with 500 and 1k hz plots", ()=>
     {
-        assertEquals(state.Tests.length > 0, true);
-        const test = state.Tests[0];
+        assertEquals(state.Test.length > 0, true);
+        const test = state.Test[0];
         assertEquals(test.Plot.length > 1, true);
         assertEquals(test.Plot[0].Hz, 500);
         assertEquals(test.Plot[1].Hz, 1000);
@@ -67,7 +67,7 @@ Deno.test("Initialize", async(t)=>
 
     await t.step("Live context values are correct", ()=>
     {
-        assertEquals(state.Live.Test, state.Tests[0]);
+        assertEquals(state.Live.Test, state.Test[0]);
         assertEquals(state.Live.Freq?.Hz, ColumnMapping[state.Freq.Value][0]);
         assertEquals(state.Live.Mark, undefined, "(User) Mark is undefined");
     });
@@ -120,7 +120,7 @@ Deno.test("Make Marks", async(t)=>
 
     await t.step("Live context values are correct", ()=>
     {
-        assertEquals(state.Live.Test, state.Tests[0]);
+        assertEquals(state.Live.Test, state.Test[0]);
         assertEquals(state.Live.Freq?.Hz, ColumnMapping[state.Freq.Value][0]);
         assertEquals(state.Live.Mark?.Stim, state.Stim.Value);
     });

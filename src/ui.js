@@ -35,6 +35,89 @@ export function Button({children, icon, light, disabled, inactive, onClick})
 }
 
 /** @type {BasicElement} */
+export const Select =()=>
+{
+    const [State, Dispatch] = Store.Consumer();
+    /** @type {(e:Event)=>void} */
+    const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
+
+    return html`
+    <div class="font-sans">
+        <label for="#test-select" class="inline-block">Select Test:</label>
+        <select id="test-select" class="px-2 py-2 rounded border(1 slate-200) inline-block" value=${State.TestIndex} onChange=${handleChange}>
+            ${State.Test.map((t, i)=>html`<option value=${i}>${t.Name}</option>`)}
+        </select>
+    </div>`;
+}
+
+/** @type {BasicElement} */
+export const Controls =()=>
+{
+    const [State, Dispatch] = Store.Consumer();
+
+    return html`
+    <div class="flex">
+        <div>Channel</div>
+        <div>${State.Chan.Value}</div>
+        <${Button} light=${State.Chan.Value == 0} inactive=${State.Chan.Value == 0} onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+        <${Button} light=${State.Chan.Value == 1} inactive=${State.Chan.Value == 1} onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+    </div>
+    <div class="flex">
+        <div>Frequency</div>
+        <div>${Store.ColumnMapping[State.Freq.Value][0]}</div>
+        <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>-<//>
+        <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>+<//>
+    </div>
+    <div class="flex">
+        <div>Stimulus</div>
+        <div>${State.Stim.Value}</div>
+        <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>-<//>
+        <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>+<//>
+    </div>
+    <div class="flex">
+        <div>Mark</div>
+        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:true })}>Response<//>
+        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:false})}>No Response<//>
+        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:null })} disabled=${State.Live.Mark == undefined}>Clear<//>
+    </div>
+    `;
+};
+
+/** @type {BasicElement} */
+export const Audiogram =()=>
+{
+    const [State] = Store.Consumer();
+
+    const testMarksL = State.Draw.TestL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false}/>`);
+    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+    const testMarksR = State.Draw.TestR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} />`);
+    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+
+    const testLinesL = State.Draw.TestL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
+    const userLinesL = State.Draw.UserL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
+    const testLinesR = State.Draw.TestR.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
+    const userLinesR = State.Draw.UserR.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
+
+    return html`
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw) opacity-50">${testMarksL}${testLinesL}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 bold draw)  opacity-50">${testMarksR}${testLinesR}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 2 draw)">${userMarksL}${userLinesL}</svg>
+    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 2 draw)">${userMarksR}${userLinesR}</svg>
+    <svg class="absolute top-0 w-1 h-1 overflow-visible transition-all duration-500" style=${{top:State.Draw.Cross?.Y, left:State.Draw.Cross?.X}}>
+        <ellipse cx="0" cy="0" rx="8" ry="30" fill="url(#glow)"></ellipse>
+        <ellipse cx="0" cy="0" rx="30" ry="8" fill="url(#glow)"></ellipse>
+        <defs>
+            <radialGradient id="glow">
+                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.6" offset="0.0"></stop>
+                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.3" offset="0.2"></stop>
+                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.0" offset="1.0"></stop>
+            </radialGradient>
+        </defs>
+    </svg>
+    `;
+};
+
+/** @type {BasicElement} */
 export function Chart({children})
 {
     const [State] = Store.Consumer();
@@ -78,7 +161,6 @@ export function Chart({children})
     </div>`;
 }
 
-
 /** @type {Record<string, BasicElement>} */
 const Glyph = {
     Arrow:()=> html`
@@ -105,4 +187,4 @@ export const Mark =({right, response, x, y, classes})=>
             ${ !response && html`<${Glyph.Arrow}/>` }
         <//>
     </svg>`;
-}
+};
