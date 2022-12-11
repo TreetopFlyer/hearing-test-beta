@@ -52,6 +52,20 @@ export const Select =()=>
 }
 
 /** @type {BasicElement} */
+export const Grade =()=>
+{
+    const [State] = Store.Consumer();
+    const grade = Store.Grade(State.Live.Test);
+    return html`<div class="font-sans">
+        <div>Complete: ${grade.Done} of ${grade.Total}</div>
+        <div>Accuracy: ${grade.Score}%</div>
+        <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
+            <div class=${`h-full w-[${grade.Done/grade.Total*100}%] bg-emerald-500 shadow-sss`}></div>
+        </div>
+    </div>`
+};
+
+/** @type {BasicElement} */
 export const Controls =()=>
 {
     const [State, Dispatch] = Store.Consumer();
@@ -79,6 +93,7 @@ export const Controls =()=>
     }, [playGet]);
 
     return html`
+    <${Grade}/>
     <div class="flex">
         <div>Channel</div>
         <div>${State.Chan.Value}</div>

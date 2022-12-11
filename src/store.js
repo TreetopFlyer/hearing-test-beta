@@ -213,3 +213,54 @@ export const Provider =(props)=>
 
 /** @type {()=>Store.Binding} */
 export const Consumer =()=> React.useContext(Context);
+
+/** @type {(inTest:Store.Test|undefined)=>Store.Grade} */
+export const Grade =(inTest)=>
+{
+    /** @type {Store.Grade} */
+    const output = { Total:0, Done:0, Score:0 };
+
+    /** @type {(inGoal:number, inResult:number)=>number} */
+    const Mapper =(inGoal, inResult)=>
+    {
+        const err = Math.abs(inGoal-inResult);
+        if(err == 0){ return 1; }
+        else if(err > 0 && err <= 5){ return 0.9; }
+        else if(err > 5 && err <= 10){ return 0.7; }
+        else if(err > 10 && err <= 15){ return 0.2; }
+        else{ return 0; }
+    }
+
+    if(inTest)
+    {
+        for(let i=0; i<inTest.Plot.length; i++)
+        {
+            const {TestL, TestR, UserL, UserR} = inTest.Plot[i];
+            if(TestL)
+            {
+                output.Total ++;
+                if(UserL)
+                {
+                    output.Done++;
+                    output.Score += Mapper(TestL.Stim, UserL.Stim);
+                }
+            }
+            if(TestR)
+            {
+                output.Total ++;
+                if(UserR)
+                {
+                    output.Done++;
+                    output.Score += Mapper(TestR.Stim, UserR.Stim);
+                }
+            }
+        }
+    }
+
+    if(output.Done > 0)
+    {
+        output.Score = Math.floor((output.Score/output.Done) * 10000)/100;
+    }
+
+    return output;
+}

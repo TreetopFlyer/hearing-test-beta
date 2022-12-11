@@ -49,4 +49,10 @@ declare namespace Store {
   type DrawChart = { Cross?:DrawPoint, UserL: DrawGroup, UserR: DrawGroup, TestL: DrawGroup, TestR: DrawGroup };
 
   type Binding = [state:State, dispatch:(inAction:Action)=>void]
+
+  type Grade = {
+    Total:number,
+    Done:number,
+    Score:number
+  };
 }
