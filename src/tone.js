@@ -42,8 +42,8 @@ const pulse = (inNode, inStart, inDuration) =>
     change(inNode, 0, (inStart+inDuration) );
 };
 
-/** @type {(inDuration:number, inContinuous:boolean, inChannel:number, inFreq:number, indBHL:number)=>void} */
-const Start = (inDuration, inContinuous, inChannel, inFreq, indBHL) =>
+/** @type {(inContinuous:boolean, inChannel:number, inFreq:number, indBHL:number)=>void} */
+export const Play = (inContinuous, inChannel, inFreq, indBHL) =>
 {
     Context.resume();
     GainBeep.gain.cancelScheduledValues(Context.currentTime);
@@ -64,29 +64,4 @@ const Start = (inDuration, inContinuous, inChannel, inFreq, indBHL) =>
         pulse(GainBeep.gain, 0.33, 0.2);
         pulse(GainBeep.gain, 0.66, 0.2);
     }
-
-};
-
-export const useTone =()=>
-{
-    const [responseGet, responseSet] = React.useState(0);
-    const [playGet, playSet] = React.useState(0);
-    React.useEffect(()=>
-    {
-        /** @type {number|undefined} */
-        let timer;
-        if(playGet == 1)
-        {
-            let volNorm = 0.5//(State.dBHL-10)/ 130;
-
-            Start(1, false, 0, 500, (volNorm*0.8) + 0.2);
-
-            //responseSet(State.dBHL - currentChan.Answer[0]);
-            timer = setTimeout(()=>{playSet(2)}, 300 + Math.random()*1000);
-        }
-        return () => clearTimeout(timer);
-        
-    }, [playGet]);
-
-    return {Play:()=>{playSet(1)}, Playing:playGet == 1, Response:playGet == 2 && responseGet };
 };

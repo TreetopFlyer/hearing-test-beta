@@ -29,7 +29,8 @@ export const Configure = {
             },
             animation:
             {
-                flash: "flash 1s both"
+                flash: "flash 1s both",
+                pulse: "pulse 3s ease-in-out 0s 1 both"
             },
             strokeWidth:
             {
