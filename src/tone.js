@@ -1,5 +1,3 @@
-import React from "react";
-
 // setup audio context
 const AudioContextConstructor = window.AudioContext || window.webkitAudioContext;
 const Context = new AudioContextConstructor();

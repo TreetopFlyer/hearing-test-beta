@@ -131,13 +131,19 @@ export const Controls =()=>
                 </radialGradient>
             </defs>
         </svg>
-        <${Button} onClick=${()=>playSet(1)} disabled=${playGet==1} icon=${"p!"}>Play<//>
+        <${Button} onClick=${()=>playSet(1)} disabled=${playGet==1} icon=${html`<svg class="w-3 h-3"><polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="none"></polygon></svg>`}>Play<//>
     </div>
     <div class="flex">
         <div>Mark</div>
-        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:true })}>Response<//>
-        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:false})}>No Response<//>
-        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:null })} disabled=${State.Live.Mark == undefined}>Clear<//>
+        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:true })} icon=${html`<${Mark} right=${State.Chan.Value} response=${true}  x="0" y="0" classes="stroke(white 2 draw) w-2 h-2 translate-x-1/2 translate-y-1/2"/>`}>Response<//>
+        <${Button} onClick=${()=>Dispatch({Name:"Mark", Data:false})} icon=${html`<${Mark} right=${State.Chan.Value} response=${false} x="0" y="0" classes="stroke(white 2 draw) w-2 h-2 translate-x-1/2 translate-y-1/2"/>`}>No Response<//>
+        <${Button}
+        icon=${html`<svg x="0" y="0" class="translate-x-1/2 translate-y-1/2 stroke-draw h-2 overflow-visible stroke-white w-2 stroke-2">
+            <ellipse vector-effect="non-scaling-stroke" rx="70%" ry="70%"></ellipse>
+            <line    vector-effect="non-scaling-stroke" x1="-50%" y1="-50%" x2="50%" y2="50%"></line>
+        </svg>`}
+        onClick=${()=>Dispatch({Name:"Mark", Data:null })}
+        disabled=${State.Live.Mark == undefined}>Clear<//>
     </div>
     `;
 };
@@ -233,8 +239,8 @@ const Glyph = {
     <g class="scale-50 translate(x-1/2 y-1/2) rotate-[-15deg]">${children}</g>`,
 
     O: ({children})=> html`
-    <ellipse rx="50%" ry="50%"></ellipse>
-    <g style="transform: translate(-35.35%, 35.35%) rotate(96deg) scale(0.5);">${children}</g>`
+    <ellipse vector-effect="non-scaling-stroke" rx="60%" ry="60%"></ellipse>
+    <g style="transform: translate(-40%, 40%) rotate(96deg) scale(0.5);">${children}</g>`
 };
 
 /** @type {({right, response, x, y, classes}:{right:boolean, response?:boolean, x:number|string, y:number|string, classes:string})=>preact.VNode} */
