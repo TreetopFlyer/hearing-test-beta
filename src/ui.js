@@ -24,11 +24,11 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
         
-        ${ icon && html`<span class="flex items-center block relative px-2 border-r(1 [#00000066])">
+        ${ icon && html`<span class="flex items-center block relative px-2 border-r(1 [#00000088])">
             <span class="absolute top-0 left-0 w-full h-full bg-black rounded(tl-lg bl-lg) ${disabled ? "opacity-20" : "opacity-50"}"></span>
             <span class="relative">${icon}</span>
         </span>` }
-        <div class="flex-1 flex items-center justify-center text-center px-3 py-2 relative border-l(1 [#ffffff44])">
+        <div class="flex-1 flex items-center justify-center text-center px-3 py-2 relative border-l(1 [#ffffff22])">
             <span class="absolute shadow-glow-yellow-500 top-0 left-1/2 w-6 h-[6px] bg-white rounded-full translate(-x-1/2 -y-1/2) transition-all duration-500 ${light ? "opacity-100" : "opacity-0 scale-y-0"}"></span>
             ${children}
         </div>
@@ -99,17 +99,33 @@ export const Controls =()=>
         <div class="box-notch">
             <div class=${classTitle}>Frequency</div>
             <div class="box-buttons">
-                <div class="w-24 text-center"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
-                <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>-<//>
-                <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>+<//>
+                <div class="w-24 text-center text-shadow-lcd"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
+                <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
+                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <${Glyph.Minus}/>
+                    </svg>
+                <//>
+                <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>
+                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <${Glyph.Plus}/>
+                    </svg>
+                <//>
             </div>
         </div>
         <div class="box-notch">
             <div class=${classTitle}>Stimulus</div>
             <div class="box-buttons">
-                <div class="w-24 text-center"><strong>${State.Stim.Value}</strong> dbHL</div>
-                <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>-<//>
-                <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>+<//>
+                <div class="w-24 text-center text-shadow-lcd"><strong>${State.Stim.Value}</strong> dbHL</div>
+                <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
+                <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <${Glyph.Minus}/>
+                    </svg>
+                <//>
+                <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>
+                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <${Glyph.Plus}/>
+                    </svg>
+                <//>
             </div>
         </div>
         <div class="box-notch">
@@ -176,9 +192,8 @@ export const Controls =()=>
                 <//>
                 <${Button}
                     icon=${html`
-                    <svg x="0" y="0" class="translate-x-1/2 translate-y-1/2 stroke-draw h-2 overflow-visible stroke-white w-2 stroke-2">
-                        <ellipse vector-effect="non-scaling-stroke" rx="70%" ry="70%"></ellipse>
-                        <line    vector-effect="non-scaling-stroke" x1="-50%" y1="-50%" x2="50%" y2="50%"></line>
+                    <svg class="h-2 w-2 overflow-visible stroke(white 2)">
+                        <${Glyph.Null}/>
                     </svg>
                     `}
                     onClick=${()=>Dispatch({Name:"Mark", Data:null })}
@@ -272,29 +287,41 @@ export function Chart({children})
 }
 
 /** @type {Record<string, BasicElement>} */
-const Glyph = {
+export const Glyph = {
     Arrow:()=> html`
-    <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="0%"   y2="0%"  ></line>
-    <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="25%"  y2="100%"></line>
-    <line vector-effect="non-scaling-stroke" x1="100%" y1="100%" x2="100%" y2="25%" ></line>`,
+    <line class="stroke-draw" x1="100%" y1="100%" x2="0%"   y2="0%"  ></line>
+    <line class="stroke-draw" x1="100%" y1="100%" x2="25%"  y2="100%"></line>
+    <line class="stroke-draw" x1="100%" y1="100%" x2="100%" y2="25%" ></line>`,
 
     X: ({children})=> html`
-    <line x1="-50%" y1="-50%" x2="50%" y2="50%" ></line>
-    <line x1="-50%" y1="50%"  x2="50%" y2="-50%"></line>
-    <g class="scale-50 translate(x-1/2 y-1/2) rotate-[-15deg]">${children}</g>`,
+    <line class="stroke-draw" x1="0%" y1="0%"   x2="100%" y2="100%"></line>
+    <line class="stroke-draw" x1="0%" y1="100%" x2="100%" y2="0%"  ></line>
+    <g class="scale-50 translate(x-full y-full) rotate-[-15deg]">${children}</g>`,
 
     O: ({children})=> html`
-    <ellipse vector-effect="non-scaling-stroke" rx="60%" ry="60%"></ellipse>
-    <g style="transform: translate(-40%, 40%) rotate(96deg) scale(0.5);">${children}</g>`
+    <ellipse class="stroke-draw" cx="50%" cy="50%" rx="60%" ry="60%"></ellipse>
+    <g class="scale-50 rotate-[96deg] translate(-x-[0%] y-full)">${children}</g>`,
+
+    Minus:()=>html` <line class="stroke-draw" x1="0%" y1="50%" x2="100%" y2="50%"></line>`,
+    Plus:()=>html`  <line class="stroke-draw" x1="0%" y1="50%" x2="100%" y2="50%"></line>
+                    <line class="stroke-draw" y1="0%" x1="50%" y2="100%" x2="50%"></line>`,
+
+    Null:()=>html`
+        <ellipse class="stroke-draw" cx="50%" cy="50%" rx="70%" ry="70%"></ellipse>
+        <line    class="stroke-draw" x1="0%" y1="0%" x2="100%" y2="100%"></line>
+    `
+
 };
 
 /** @type {({right, response, x, y, classes}:{right:boolean, response?:boolean, x:number|string, y:number|string, classes:string})=>preact.VNode} */
 export const Mark =({right, response, x, y, classes})=>
 {
     return html`
-    <svg x=${x} y=${y} width="20" height="20" class=${`overflow-visible ${classes}`}>
-        <${ right ? Glyph.O : Glyph.X }>
-            ${ !response && html`<${Glyph.Arrow}/>` }
-        <//>
+    <svg x=${x} y=${y} width="20" height="20" class="overflow-visible ${classes}">
+        <g class="translate(-x-1/2 -y-1/2)">
+            <${ right ? Glyph.O : Glyph.X }>
+                ${ !response && html`<${Glyph.Arrow}/>` }
+            <//>
+        </g>
     </svg>`;
 };

@@ -67,6 +67,9 @@ export const Configure = {
                 "box-shadow": "rgb(0 0 0 / 50%) 0px -2px 3px inset, rgb(255 255 255 / 50%) 0px 10px 10px inset"
             }
         ],
+        [
+            'text-shadow-lcd', {"text-shadow": "0px 2px 3px #00000096"}
+        ],
         [ 'box-notch', "border-t(1 [#ffffff]) border-b(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
         [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-[#00000022] border-b(1 [#ffffff]) border-t(1 [#00000033])"]
     ],
