@@ -52,7 +52,10 @@ export const Configure = {
             "bg-metal",
             {
                 "background": "linear-gradient(159deg, rgb(228, 228, 228) 0%, rgb(243, 243, 243) 25%, rgb(236, 236, 236) 100%)"
-            }
+            },
+        ],
+        [
+            "bg-earmark", "bg-gradient-to-b from-[#107c79] to-[#115e67]"
         ],
         [
             'shadow-glow-(.*)',
@@ -70,7 +73,7 @@ export const Configure = {
         [
             'text-shadow-lcd', {"text-shadow": "0px 2px 2px #00000055"}
         ],
-        [ 'box-notch', "border-t(1 [#ffffff]) border-b(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
+        [ 'box-notch', "border-t(1 [#ffffff]) border-r(1 [#ffffff]) border-b(1 [#00000033]) border-l(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
         [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-[#00000022] border-b(1 [#ffffff]) border-t(1 [#00000033])"]
     ],
     presets: [TWPreTail(), TWPreAuto()]

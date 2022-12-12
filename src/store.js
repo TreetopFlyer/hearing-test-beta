@@ -146,6 +146,14 @@ export function Reducer(inState, inAction)
             clone.Live = Reselect(clone);
         }
     }
+    else if (Name == "ShowCursor")
+    {
+        clone.Show.Cursor = Data;
+    }
+    else if (Name == "ShowAnswer")
+    {
+        clone.Show.Answer = Data;
+    }
 
     return clone;
 }
@@ -168,6 +176,11 @@ export const Initial = Reducer(
         UserR:{Points:[], Paths:[]},
         TestL:{Points:[], Paths:[]},
         TestR:{Points:[], Paths:[]}
+    },
+    Show:
+    {
+        Cursor:true,
+        Answer:false
     },
     TestIndex: 0,
     Test: [

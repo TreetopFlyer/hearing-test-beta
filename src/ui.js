@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all ${classes} ${disabled ? "bg-zinc-400" : "bg-gradient-to-b from-emerald-700 to-emerald-500"} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : "bg-earmark"} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -45,15 +45,31 @@ export const Select =()=>
     const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
 
     return html`
-    <div class="font-sans">
-        <label for="test-select" class="inline-block">Select Test:</label>
-        <select id="test-select" class="px-2 py-2 rounded border(1 slate-200) inline-block" value=${State.TestIndex} onChange=${handleChange}>
-            ${State.Test.map((t, i)=>html`<option value=${i}>${t.Name}</option>`)}
-        </select>
-        <div>Complete: ${grade.Done} of ${grade.Total}</div>
-        <div>Accuracy: ${grade.Score}%</div>
-        <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
-            <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-emerald-500 shadow-sss"></div>
+    <div class="inline-flex flex-row align-center bg-metal rounded-lg overflow-hidden shadow-md font-sans">
+        <div class="box-notch">
+            <div >Select Test</div>
+            <div class="box-buttons">
+                <select id="test-select" class="px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.TestIndex} onChange=${handleChange}>
+                    ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
+                </select>
+            </div>
+        </div>
+        <div class="box-notch">
+            <div>Progress</div>
+            <div class="box-buttons flex-col">
+                <div>Complete: ${grade.Done} of ${grade.Total}</div>
+                <div class="w-full h-4 bg-zinc-400 rounded-full overflow-hidden">
+                    <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-earmark"></div>
+                </div>
+                <div class="text-sm">Accuracy: ${grade.Score}%</div>
+            </div>
+        </div>
+        <div class="box-notch">
+            <div>Display</div>
+            <div class="box-buttons flex-col">
+                <${Button} light=${State.Show.Cursor} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowCursor", Data:!State.Show.Cursor})}>Cursor<//>
+                <${Button} light=${State.Show.Answer} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowAnswer", Data:!State.Show.Answer})}>Answer<//>
+            </div>
         </div>
     </div>`;
 }
@@ -78,7 +94,7 @@ export const Controls =()=>
             {
                 const testMark = State.Live.Freq[/** @type {"TestL"|"TestR"}*/(`Test${State.Chan.Value ? "R":"L"}`)];
                 const handler = testMark.Stim <= State.Stim.Value ? ()=>{playSet(2)} : ()=>{playSet(0)}
-                timer = setTimeout(handler, 500 + Math.random()*1000);
+                timer = setTimeout(handler, 800 + Math.random()*1300);
             }
         }
         return () => clearTimeout(timer);
@@ -91,14 +107,14 @@ export const Controls =()=>
     <div class="font-sans bg-metal rounded-lg overflow-hidden shadow-md">
         <div class="box-notch">
             <div class=${classTitle}>Channel</div>
-            <div class="box-buttons">
-                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
-                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+            <div class="box-buttons min-w-[50%]">
+                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
             </div>
         </div>
         <div class="box-notch">
             <div class=${classTitle}>Frequency</div>
-            <div class="box-buttons">
+            <div class="box-buttons min-w-[50%]">
                 <div class="w-24 text-center text-shadow-lcd"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
                 <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
                     <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
@@ -114,7 +130,7 @@ export const Controls =()=>
         </div>
         <div class="box-notch">
             <div class=${classTitle}>Stimulus</div>
-            <div class="box-buttons">
+            <div class="box-buttons min-w-[50%]">
                 <div class="w-24 text-center text-shadow-lcd"><strong>${State.Stim.Value}</strong> dbHL</div>
                 <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
                 <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
@@ -177,7 +193,7 @@ export const Controls =()=>
         </div>
         <div class="box-notch">
             <div class=${classTitle}>Threshold</div>
-            <div class="box-buttons flex-col gap-2">
+            <div class="box-buttons flex-col gap-2 min-w-[50%]">
                 <${Button}
                     onClick=${()=>Dispatch({Name:"Mark", Data:true })}
                     classes="text-md w-full"
@@ -190,7 +206,7 @@ export const Controls =()=>
                 <//>
                 <${Button}
                     onClick=${()=>Dispatch({Name:"Mark", Data:false})}
-                    classes="text-sm"
+                    classes="text-sm w-full"
                     icon=${html`
                         <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
                             <${State.Chan.Value ? Glyph.O : Glyph.X}>
@@ -234,22 +250,28 @@ export const Audiogram =()=>
     const userLinesR = State.Draw.UserR.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
 
     return html`
-    <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw) opacity-50">${testMarksL}${testLinesL}</svg>
-    <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 bold draw)  opacity-50">${testMarksR}${testLinesR}</svg>
+    ${
+        State.Show.Answer && html`
+        <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 bold draw) opacity-50">${testMarksL}${testLinesL}</svg>
+        <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 bold draw)  opacity-50">${testMarksR}${testLinesR}</svg>
+        `
+    }
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(blue-700 2 draw)">${userMarksL}${userLinesL}</svg>
     <svg class="absolute top-0 w-full h-full overflow-visible stroke(red-700 2 draw)">${userMarksR}${userLinesR}</svg>
-    <svg class="absolute top-0 w-1 h-1 overflow-visible transition-all duration-500" style=${{top:State.Draw.Cross?.Y, left:State.Draw.Cross?.X}}>
-        <ellipse cx="0" cy="0" rx="8" ry="30" fill="url(#glow)"></ellipse>
-        <ellipse cx="0" cy="0" rx="30" ry="8" fill="url(#glow)"></ellipse>
-        <defs>
-            <radialGradient id="glow">
-                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.6" offset="0.0"></stop>
-                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.3" offset="0.2"></stop>
-                <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.0" offset="1.0"></stop>
-            </radialGradient>
-        </defs>
-    </svg>
-    `;
+    ${
+        State.Show.Cursor && html`
+        <svg class="absolute top-0 w-1 h-1 overflow-visible transition-all duration-500" style=${{top:State.Draw.Cross?.Y, left:State.Draw.Cross?.X}}>
+            <ellipse cx="0" cy="0" rx="8" ry="30" fill="url(#glow)"></ellipse>
+            <ellipse cx="0" cy="0" rx="30" ry="8" fill="url(#glow)"></ellipse>
+            <defs>
+                <radialGradient id="glow">
+                    <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.6" offset="0.0"></stop>
+                    <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.3" offset="0.2"></stop>
+                    <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.0" offset="1.0"></stop>
+                </radialGradient>
+            </defs>
+        </svg>`
+    }`;
 };
 
 /** @type {BasicElement} */
@@ -262,7 +284,7 @@ export function Chart({children})
     Store.ColumnMapping.forEach(([label, position, normal])=>
     {
         rules.push(html`
-        <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 slate-400) ${!normal && "border-dashed"}">
+        <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 zinc-300) ${!normal && "border-dashed"}">
             <span class="block absolute top-0 left-0 -translate-x-1/2 -translate-y-full pb-${normal ? 4 : 1}">${label}</span>
         </span>`
         );
@@ -271,7 +293,7 @@ export function Chart({children})
     for(let db = State.Stim.Min; db <= State.Stim.Max; db+=10)
     {
         rules.push(html`
-        <span class="block absolute  left-[-${inset}px]   top-[${((db-State.Stim.Min) / (State.Stim.Max-State.Stim.Min))*100}%]   h-0 w-[calc(100%+${inset*2}px)] border-b(${db == 0 ? "2 black" : "1 slate-400"})">
+        <span class="block absolute  left-[-${inset}px]   top-[${((db-State.Stim.Min) / (State.Stim.Max-State.Stim.Min))*100}%]   h-0 w-[calc(100%+${inset*2}px)] border-b(${db == 0 ? "2 black" : "1 zinc-300"})">
             <span class="block absolute top-0 left-0 -translate-x-full -translate-y-1/2 pr-2">${db}</span>
         </span>`
         );
