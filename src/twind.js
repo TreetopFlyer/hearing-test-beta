@@ -49,6 +49,12 @@ export const Configure = {
             },
         ],
         [
+            "bg-metal",
+            {
+                "background": "linear-gradient(159deg, rgb(236, 236, 236) 0%, rgb(233, 233, 233) 36%, rgb(213, 213, 213) 36.1%, rgb(236, 236, 236) 100%)"
+            }
+        ],
+        [
             'shadow-glow-(.*)',
             (match, context)=>
             {
@@ -58,9 +64,11 @@ export const Configure = {
         [
             'shadow-sss',
             {
-                "box-shadow": "rgb(0 0 0 / 50%) 0px -3px 2px inset, rgb(255 255 255 / 50%) 0px 10px 10px inset"
+                "box-shadow": "rgb(0 0 0 / 50%) 0px -2px 3px inset, rgb(255 255 255 / 50%) 0px 10px 10px inset"
             }
-        ]
+        ],
+        [ 'box-notch', "border-t(1 [#ffffff]) border-b(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
+        [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-zinc-300 border-b(1 [#ffffff]) border-t(1 [#00000033])"]
     ],
     presets: [TWPreTail(), TWPreAuto()]
 };

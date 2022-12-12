@@ -16,9 +16,15 @@ TW.Init(ShadowCSS, ShadowDiv);
 React.render(html`
     <${Store.Provider}>
         <${UI.Select}/>
-        <${UI.Controls}/>
-        <${UI.Chart}>
-            <${UI.Audiogram}/>
-        <//>
+
+        <div class="flex">
+            <${UI.Controls}/>
+            <div class="flex-1">
+                <${UI.Chart}>
+                    <${UI.Audiogram}/>
+                <//>
+            </div>
+        </div>
+        
     <//>
 `, ShadowDiv);

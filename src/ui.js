@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="shadow-sss relative flex items-stretch rounded-xl text(lg white) font-sans group transition-all ${classes} ${disabled ? "bg-zinc-400" : "bg-emerald-600"} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all ${classes} ${disabled ? "bg-zinc-400" : "bg-gradient-to-b from-emerald-700 to-emerald-500"} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -39,31 +39,24 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
 export const Select =()=>
 {
     const [State, Dispatch] = Store.Consumer();
+    const grade = Store.Grade(State.Live.Test);
+
     /** @type {(e:Event)=>void} */
     const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
 
     return html`
     <div class="font-sans">
-        <label for="#test-select" class="inline-block">Select Test:</label>
+        <label for="test-select" class="inline-block">Select Test:</label>
         <select id="test-select" class="px-2 py-2 rounded border(1 slate-200) inline-block" value=${State.TestIndex} onChange=${handleChange}>
             ${State.Test.map((t, i)=>html`<option value=${i}>${t.Name}</option>`)}
         </select>
-    </div>`;
-}
-
-/** @type {BasicElement} */
-export const Grade =()=>
-{
-    const [State] = Store.Consumer();
-    const grade = Store.Grade(State.Live.Test);
-    return html`<div class="font-sans">
         <div>Complete: ${grade.Done} of ${grade.Total}</div>
         <div>Accuracy: ${grade.Score}%</div>
         <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
             <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-emerald-500 shadow-sss"></div>
         </div>
-    </div>`
-};
+    </div>`;
+}
 
 /** @type {BasicElement} */
 export const Controls =()=>
@@ -92,31 +85,34 @@ export const Controls =()=>
         
     }, [playGet]);
 
-    const classRow = "flex items-center justify-end gap-1"
-    const classTitle = "flex-1"
+    const classTitle = "flex-1 text-sm"
 
     return html`
-    <${Grade}/>
-    <div class="flex flex-col gap-3 font-sans max-w-[300px]">
-        <div class=${classRow}>
+    <div class="self-start font-sans bg-metal rounded-lg overflow-hidden">
+        <div class="box-notch">
             <div class=${classTitle}>Channel</div>
-            <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
-            <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+            <div class="box-buttons">
+                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+            </div>
         </div>
-        <div class=${classRow}>
+        <div class="box-notch">
             <div class=${classTitle}>Frequency</div>
-            <div class="w-24 text-center"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
-            <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>-<//>
-            <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>+<//>
+            <div class="box-buttons">
+                <div class="w-24 text-center"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
+                <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>-<//>
+                <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>+<//>
+            </div>
         </div>
-        <div class=${classRow}>
+        <div class="box-notch">
             <div class=${classTitle}>Stimulus</div>
-            <div class="w-24 text-center"><strong>${State.Stim.Value}</strong> dbHL</div>
-            <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>-<//>
-            <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>+<//>
+            <div class="box-buttons">
+                <div class="w-24 text-center"><strong>${State.Stim.Value}</strong> dbHL</div>
+                <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>-<//>
+                <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>+<//>
+            </div>
         </div>
-
-        <div class="flex gap-2 my-4">
+        <div class="box-notch">
             <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none">
                 <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
                 <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
@@ -144,28 +140,29 @@ export const Controls =()=>
                     </radialGradient>
                 </defs>
             </svg>
-            <div class="flex-1">
-                <${Button}
-                    classes="w-full flex-1 self-center"
-                    onClick=${()=>playSet(1)}
-                    disabled=${playGet==1}
-                    icon=${html`<svg class="w-3 h-3 my-4"><polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="none"></polygon></svg>`}
-                >
-                    Present Tone
-                <//>
-                <div class="flex gap-1 mt-2">
-                    <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
-                    <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
+            <div class="box-buttons flex-1">
+                <div class="flex-1">
+                    <${Button}
+                        classes="w-full flex-1 self-center"
+                        onClick=${()=>playSet(1)}
+                        disabled=${playGet==1}
+                        icon=${html`<svg class="w-3 h-3 my-4"><polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="none"></polygon></svg>`}
+                    >
+                        Present Tone
+                    <//>
+                    <div class="flex gap-1 mt-2">
+                        <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
+                        <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
+                    </div>
                 </div>
             </div>
         </div>
-
-        <div class=${classRow}>
+        <div class="box-notch">
             <div class=${classTitle}>Threshold</div>
-            <div class="flex flex-col gap-2">
+            <div class="box-buttons flex-col gap-2">
                 <${Button}
                     onClick=${()=>Dispatch({Name:"Mark", Data:true })}
-                    classes="text-sm"
+                    classes="text-md w-full"
                     icon=${html`<${Mark} right=${State.Chan.Value} response=${true}  x="0" y="0" classes="stroke(white 2 draw) w-2 h-2 translate-x-1/2 translate-y-1/2"/>`}
                 >
                     Accept
@@ -185,7 +182,7 @@ export const Controls =()=>
                     </svg>
                     `}
                     onClick=${()=>Dispatch({Name:"Mark", Data:null })}
-                    classes="text-sm"
+                    classes="text-sm w-full"
                     disabled=${State.Live.Mark == undefined}
                 >
                     Clear
@@ -255,7 +252,7 @@ export function Chart({children})
         );
     }
     return html`
-    <div class="relative w-full h-[600px] font(sans medium) text(xs)">
+    <div class="relative w-full h-[800px] font(sans medium) text(xs)">
         <div class="absolute right-0 bottom-0 w-[calc(100%-100px)] h-[calc(100%-100px)] border(1 slate-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency in Hz</span>
             <span class="inline-block absolute top-[50%]   left-[-65px] ">
