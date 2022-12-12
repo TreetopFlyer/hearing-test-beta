@@ -162,9 +162,11 @@ export const Controls =()=>
                         classes="w-full flex-1 self-center"
                         onClick=${()=>playSet(1)}
                         disabled=${playGet==1}
-                        icon=${html`<svg class="w-3 h-3 my-4"><polygon points="0,0 10,5 0,10" fill="#ffffff" stroke="none"></polygon></svg>`}
+                        icon=${html`<svg class="w-3 h-3 mx-1" viewBox="0 0 20 20">
+                            <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
+                        </svg>`}
                     >
-                        Present Tone
+                        <span class="py-2">Present Tone</span>
                     <//>
                     <div class="flex gap-1 mt-2">
                         <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
@@ -179,20 +181,28 @@ export const Controls =()=>
                 <${Button}
                     onClick=${()=>Dispatch({Name:"Mark", Data:true })}
                     classes="text-md w-full"
-                    icon=${html`<${Mark} right=${State.Chan.Value} response=${true}  x="0" y="0" classes="stroke(white 2 draw) w-2 h-2 translate-x-1/2 translate-y-1/2"/>`}
+                    icon=${html`
+                        <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                            <${State.Chan.Value ? Glyph.O : Glyph.X}/>
+                        </svg>`}
                 >
                     Accept
                 <//>
                 <${Button}
                     onClick=${()=>Dispatch({Name:"Mark", Data:false})}
                     classes="text-sm"
-                    icon=${html`<${Mark} right=${State.Chan.Value} response=${false} x="0" y="0" classes="stroke(white 2 draw) w-2 h-2 translate-x-1/2 translate-y-1/2"/>`}
+                    icon=${html`
+                        <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                            <${State.Chan.Value ? Glyph.O : Glyph.X}>
+                                <${Glyph.Arrow}/>
+                            <//>
+                        </svg>`}
                 >
                     No Response
                 <//>
                 <${Button}
                     icon=${html`
-                    <svg class="h-2 w-2 overflow-visible stroke(white 2)">
+                    <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
                         <${Glyph.Null}/>
                     </svg>
                     `}
