@@ -68,7 +68,7 @@ export const Configure = {
             }
         ],
         [ 'box-notch', "border-t(1 [#ffffff]) border-b(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
-        [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-zinc-300 border-b(1 [#ffffff]) border-t(1 [#00000033])"]
+        [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-[#00000022] border-b(1 [#ffffff]) border-t(1 [#00000033])"]
     ],
     presets: [TWPreTail(), TWPreAuto()]
 };

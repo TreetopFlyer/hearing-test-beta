@@ -88,7 +88,7 @@ export const Controls =()=>
     const classTitle = "flex-1 text-sm"
 
     return html`
-    <div class="self-start font-sans bg-metal rounded-lg overflow-hidden">
+    <div class="font-sans bg-metal rounded-lg overflow-hidden">
         <div class="box-notch">
             <div class=${classTitle}>Channel</div>
             <div class="box-buttons">

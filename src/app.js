@@ -17,7 +17,7 @@ React.render(html`
     <${Store.Provider}>
         <${UI.Select}/>
 
-        <div class="flex">
+        <div class="flex items-center">
             <${UI.Controls}/>
             <div class="flex-1">
                 <${UI.Chart}>
@@ -25,6 +25,6 @@ React.render(html`
                 <//>
             </div>
         </div>
-        
+
     <//>
 `, ShadowDiv);
