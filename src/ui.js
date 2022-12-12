@@ -284,7 +284,7 @@ export function Chart({children})
     Store.ColumnMapping.forEach(([label, position, normal])=>
     {
         rules.push(html`
-        <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 zinc-300) ${!normal && "border-dashed"}">
+        <span class="block absolute top-[-${inset}px] left-[${position*100}%] w-0 h-[calc(100%+${inset*2}px)] border-r(1 zinc-400) ${!normal && "border-dashed"}">
             <span class="block absolute top-0 left-0 -translate-x-1/2 -translate-y-full pb-${normal ? 4 : 1}">${label}</span>
         </span>`
         );
@@ -293,16 +293,16 @@ export function Chart({children})
     for(let db = State.Stim.Min; db <= State.Stim.Max; db+=10)
     {
         rules.push(html`
-        <span class="block absolute  left-[-${inset}px]   top-[${((db-State.Stim.Min) / (State.Stim.Max-State.Stim.Min))*100}%]   h-0 w-[calc(100%+${inset*2}px)] border-b(${db == 0 ? "2 black" : "1 zinc-300"})">
+        <span class="block absolute  left-[-${inset}px]   top-[${((db-State.Stim.Min) / (State.Stim.Max-State.Stim.Min))*100}%]   h-0 w-[calc(100%+${inset*2}px)] border-b(${db == 0 ? "2 black" : "1 zinc-400"})">
             <span class="block absolute top-0 left-0 -translate-x-full -translate-y-1/2 pr-2">${db}</span>
         </span>`
         );
     }
     return html`
     <div class="relative w-full h-[800px] font(sans medium) text(xs)">
-        <div class="absolute right-0 bottom-0 w-[calc(100%-100px)] h-[calc(100%-100px)] border(1 slate-300)">
+        <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-50px)] border(1 zinc-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency in Hz</span>
-            <span class="inline-block absolute top-[50%]   left-[-65px] ">
+            <span class="inline-block absolute top-[50%]   left-[-50px] ">
                 <span class="inline-block -rotate-90 origin-top -translate-x-1/2 text(sm center) font-black">
                     Hearing Level (dbHL)
                 </span>
