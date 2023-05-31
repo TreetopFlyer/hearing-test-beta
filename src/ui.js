@@ -274,6 +274,7 @@ export const Audiogram =()=>
     }`;
 };
 
+
 /** @type {BasicElement} */
 export function Chart({children})
 {
@@ -308,7 +309,7 @@ export function Chart({children})
                 </span>
             </span>
             <div class=${`relative top-[${inset}px] left-[${inset}px] w-[calc(100%-${inset*2}px)] h-[calc(100%-${inset*2}px)]`}>
-                <span class="block absolute top-0 left-[-${inset}px] w-[calc(100%+${inset*2}px)] h-[27%] bg-black opacity-10"></span>
+                <span class="block absolute top-0 left-[-${inset}px] w-[calc(100%+${inset*2}px)] h-[27%] bg-black opacity-5"></span>
                 ${ rules }
                 <div class="absolute top-0 left-0 w-full h-full">
                     ${ children }

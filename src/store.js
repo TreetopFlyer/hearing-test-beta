@@ -44,7 +44,8 @@ const Reselect =(inState, inTest)=>
             if(plot.Hz == hz)
             {
                 output.Freq = plot;
-                output.Mark = plot[`User${inState.Chan.Value ? "R" : "L"}`];
+                output.Mark = inState.Chan.Value ? plot.UserR : plot.UserL;
+                break;
             }
         }
     }
