@@ -240,8 +240,8 @@ export const Initial = Reducer(
     ]
 }, {Name:"Test", Data:0});
 
-/** @type {preact.Context<Store.Binding>} */
-export const Context = React.createContext([Initial, (_a)=>{}]);
+
+export const Context = React.createContext(/** @type {Store.Binding} */([Initial, (_a)=>{}]));
 
 /** @type {(props:{children:preact.ComponentChildren})=>preact.VNode} */
 export const Provider =(props)=>

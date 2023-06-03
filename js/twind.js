@@ -2,7 +2,7 @@ import * as TW   from "@twind/core@1.0.1";
 import TWPreTail from "@twind/preset-tailwind@1.0.1";
 import TWPreAuto from "@twind/preset-autoprefix@1.0.1";
 
-/** @type {TW.TwindConfig} */
+/** @type {TW.TwindUserConfig} */
 export const Configure = {
     theme:
     {

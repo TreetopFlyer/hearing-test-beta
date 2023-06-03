@@ -47,6 +47,11 @@ export const Select =()=>
     return html`
     <div class="inline-flex flex-row align-center bg-metal rounded-lg overflow-hidden shadow-md font-sans">
         <div class="box-notch">
+            <div class="p-4">
+                <img class="h-auto max-w-xs" src="./logo.png"/>
+            </div>
+        </div>
+        <div class="box-notch">
             <div >Select Test</div>
             <div class="box-buttons">
                 <select id="test-select" class="px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.TestIndex} onChange=${handleChange}>
@@ -104,12 +109,17 @@ export const Controls =()=>
     const classTitle = "flex-1 text-sm"
 
     return html`
-    <div class="font-sans bg-metal rounded-lg overflow-hidden shadow-md">
+    <div class="flex flex-row font-sans bg-metal rounded-lg overflow-hidden shadow-md">
         <div class="box-notch">
-            <div class=${classTitle}>Channel</div>
-            <div class="box-buttons min-w-[50%]">
-                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
-                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+            <div>
+                <div class=${classTitle}>Channel</div>
+                <div class="box-buttons min-w-[50%]">
+                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+                </div>
+            </div>
+            <div>
+                
             </div>
         </div>
         <div class="box-notch">
