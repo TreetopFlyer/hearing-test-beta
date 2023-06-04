@@ -36,7 +36,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
 }
 
 /** @type {BasicElement} */
-export const Select =()=>
+export const Header =()=>
 {
     const [State, Dispatch] = Store.Consumer();
     const grade = Store.Grade(State.Live.Test);
@@ -45,23 +45,28 @@ export const Select =()=>
     const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
 
     return html`
-    <div class="inline-flex flex-row align-center bg-metal rounded-lg overflow-hidden shadow-md font-sans">
-        <div class="box-notch">
-            <div class="p-4">
-                <img class="h-auto max-w-xs" src="./logo.png"/>
-            </div>
+    <div class="flex flex-row items-stretch bg-metal rounded-lg overflow-hidden shadow-md font-sans">
+
+        <div class="p-4">
+            <img class="h-auto max-w-[200px]" src="./logo.png"/>
         </div>
-        <div class="box-notch">
-            <div >Select Test</div>
-            <div class="box-buttons">
-                <select id="test-select" class="px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.TestIndex} onChange=${handleChange}>
+
+        <div class="p-4 flex-1">
+            <div class="box-buttons w-full">
+                <select id="test-select" class="w-full px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.TestIndex} onChange=${handleChange}>
                     ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
                 </select>
             </div>
+            <div class="box-buttons w-full mt-2">
+                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>None<//>
+                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Slight<//>
+                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Moderate<//>
+                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Severe<//>
+            </div>
         </div>
-        <div class="box-notch">
-            <div>Progress</div>
-            <div class="box-buttons flex-col">
+
+        <div class="p-4">
+            <div class="box-buttons flex-col w-[200px] h-full justify-center">
                 <div>Complete: ${grade.Done} of ${grade.Total}</div>
                 <div class="w-full h-4 bg-zinc-400 rounded-full overflow-hidden">
                     <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-earmark"></div>
@@ -69,15 +74,24 @@ export const Select =()=>
                 <div class="text-sm">Accuracy: ${grade.Score}%</div>
             </div>
         </div>
-        <div class="box-notch">
-            <div>Display</div>
-            <div class="box-buttons flex-col">
+    </div>`;
+}
+
+/** @type {BasicElement} */
+export const Display =()=>
+{
+    const [State, Dispatch] = Store.Consumer();
+    return html`
+    <div class="flex justify-end">
+        <div class="bg-metal rounded-lg overflow-hidden shadow-md p-4">
+            <div class="box-buttons">
                 <${Button} light=${State.Show.Cursor} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowCursor", Data:!State.Show.Cursor})}>Cursor<//>
                 <${Button} light=${State.Show.Answer} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowAnswer", Data:!State.Show.Answer})}>Answer<//>
             </div>
         </div>
-    </div>`;
-}
+    </div>
+    `;
+};
 
 /** @type {BasicElement} */
 export const Controls =()=>
@@ -109,135 +123,134 @@ export const Controls =()=>
     const classTitle = "flex-1 text-sm"
 
     return html`
-    <div class="flex flex-row font-sans bg-metal rounded-lg overflow-hidden shadow-md">
-        <div class="box-notch">
-            <div>
-                <div class=${classTitle}>Channel</div>
+    <div class="flex flex-col w-full md:w-[320px] font-sans justify-center gap-4">
+        <div class="flex-col bg-metal rounded-lg overflow-hidden shadow-md">
+            <div class="p-4 pb-1">
                 <div class="box-buttons min-w-[50%]">
-                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
-                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left Ear<//>
+                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right Ear<//>
                 </div>
             </div>
-            <div>
-                
-            </div>
-        </div>
-        <div class="box-notch">
-            <div class=${classTitle}>Frequency</div>
-            <div class="box-buttons min-w-[50%]">
-                <div class="w-24 text-center text-shadow-lcd"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
-                <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
-                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
-                        <${Glyph.Minus}/>
-                    </svg>
-                <//>
-                <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>
-                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
-                        <${Glyph.Plus}/>
-                    </svg>
-                <//>
-            </div>
-        </div>
-        <div class="box-notch">
-            <div class=${classTitle}>Stimulus</div>
-            <div class="box-buttons min-w-[50%]">
-                <div class="w-24 text-center text-shadow-lcd"><strong>${State.Stim.Value}</strong> dbHL</div>
-                <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
-                <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
-                        <${Glyph.Minus}/>
-                    </svg>
-                <//>
-                <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>
-                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
-                        <${Glyph.Plus}/>
-                    </svg>
-                <//>
-            </div>
-        </div>
-        <div class="box-notch">
-            <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none">
-                <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
-                <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
-                <circle fill="url(#metal)" cx="39" cy="40" r="27"></circle>
-                <circle fill="url(#backwall)" cx="39" cy="40" r="25"></circle>
-                <ellipse fill="url(#clearcoat)" cx="39" cy="33" rx="20" ry="16"></ellipse>
-                ${playGet == 2 && html`<circle fill="url(#light)" cx="39.5" cy="39.5" r="36" class="animate-pulse"></circle>`}
-                <defs>
-                    <linearGradient id="metal" x1="39.5" y1="1" x2="39.5" y2="78" gradientUnits="userSpaceOnUse">
-                        <stop offset="0.0" stop-color="#C4C4C4" stop-opacity="1.0"></stop>
-                        <stop offset="1.0" stop-color="#F2F2F2" stop-opacity="1.0"></stop>
-                    </linearGradient>
-                    <radialGradient id="backwall" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 56) rotate(-90) scale(45.5 74.4907)">
-                        <stop offset="0.0" stop-color="#AAAAAA" stop-opacity="1.0"></stop>
-                        <stop offset="1.0" stop-color="#333333" stop-opacity="1.0"></stop>
-                    </radialGradient>
-                    <radialGradient id="clearcoat" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 38.5) rotate(90) scale(50.5 71.9394)">
-                        <stop offset="0.0" stop-color="#ffffff" stop-opacity="0.0"></stop>
-                        <stop offset="0.7" stop-color="#ffffff" stop-opacity="1.0"></stop>
-                    </radialGradient>
-                    <radialGradient id="light" cx="0" cy="0" r="1.0" gradientUnits="userSpaceOnUse" gradientTransform="translate(39.5 39.5) rotate(90) scale(39.5)">
-                        <stop offset="0.2" stop-color="#ffffff" stop-opacity="1.0"></stop>
-                        <stop offset="0.5" stop-color="#ff8800" stop-opacity="1.6"></stop>
-                        <stop offset="0.9" stop-color="#ffffff" stop-opacity="0.0"></stop>
-                    </radialGradient>
-                </defs>
-            </svg>
-            <div class="box-buttons flex-1">
-                <div class="flex-1">
-                    <${Button}
-                        classes="w-full flex-1 self-center"
-                        onClick=${()=>playSet(1)}
-                        disabled=${playGet==1}
-                        icon=${html`<svg class="w-3 h-3 mx-1" viewBox="0 0 20 20">
-                            <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
-                        </svg>`}
-                    >
-                        <span class="py-2">Present Tone</span>
+            <div class="p-4 py-1">
+                <div class="box-buttons min-w-[50%]">
+                    <div class="flex-1 text-center text-shadow-lcd"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
+                    <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
+                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                            <${Glyph.Minus}/>
+                        </svg>
                     <//>
-                    <div class="flex gap-1 mt-2">
-                        <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
-                        <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
+                    <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>
+                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                            <${Glyph.Plus}/>
+                        </svg>
+                    <//>
+                </div>
+            </div>
+            <div class="p-4 pt-2">
+                <div class="box-buttons min-w-[50%]">
+                    <div class="flex-1 text-center text-shadow-lcd"><strong>${State.Stim.Value}</strong> dbHL</div>
+                    <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
+                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                            <${Glyph.Minus}/>
+                        </svg>
+                    <//>
+                    <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>
+                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                            <${Glyph.Plus}/>
+                        </svg>
+                    <//>
+                </div>
+            </div>
+            
+        </div>
+
+        <div class="flex-col bg-metal rounded-lg overflow-hidden shadow-md">
+            <div class="p-4 pb-0">
+                <div class="box-buttons flex-1">
+                    <div class="flex-1">
+                        <${Button}
+                            classes="w-full flex-1 self-center"
+                            onClick=${()=>playSet(1)}
+                            disabled=${playGet==1}
+                            icon=${html`<svg class="w-3 h-3 mx-1" viewBox="0 0 20 20">
+                                <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
+                            </svg>`}
+                        >
+                            <span class="py-2">Present Tone</span>
+                        <//>
+                        <div class="flex gap-1 mt-2">
+                            <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
+                            <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
+                        </div>
                     </div>
                 </div>
+                <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
+                    <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
+                    <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
+                    <circle fill="url(#metal)" cx="39" cy="40" r="27"></circle>
+                    <circle fill="url(#backwall)" cx="39" cy="40" r="25"></circle>
+                    <ellipse fill="url(#clearcoat)" cx="39" cy="33" rx="20" ry="16"></ellipse>
+                    ${playGet == 2 && html`<circle fill="url(#light)" cx="39.5" cy="39.5" r="36" class="animate-pulse"></circle>`}
+                    <defs>
+                        <linearGradient id="metal" x1="39.5" y1="1" x2="39.5" y2="78" gradientUnits="userSpaceOnUse">
+                            <stop offset="0.0" stop-color="#C4C4C4" stop-opacity="1.0"></stop>
+                            <stop offset="1.0" stop-color="#F2F2F2" stop-opacity="1.0"></stop>
+                        </linearGradient>
+                        <radialGradient id="backwall" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 56) rotate(-90) scale(45.5 74.4907)">
+                            <stop offset="0.0" stop-color="#AAAAAA" stop-opacity="1.0"></stop>
+                            <stop offset="1.0" stop-color="#333333" stop-opacity="1.0"></stop>
+                        </radialGradient>
+                        <radialGradient id="clearcoat" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 38.5) rotate(90) scale(50.5 71.9394)">
+                            <stop offset="0.0" stop-color="#ffffff" stop-opacity="0.0"></stop>
+                            <stop offset="0.7" stop-color="#ffffff" stop-opacity="1.0"></stop>
+                        </radialGradient>
+                        <radialGradient id="light" cx="0" cy="0" r="1.0" gradientUnits="userSpaceOnUse" gradientTransform="translate(39.5 39.5) rotate(90) scale(39.5)">
+                            <stop offset="0.2" stop-color="#ffffff" stop-opacity="1.0"></stop>
+                            <stop offset="0.5" stop-color="#ff8800" stop-opacity="1.6"></stop>
+                            <stop offset="0.9" stop-color="#ffffff" stop-opacity="0.0"></stop>
+                        </radialGradient>
+                    </defs>
+                </svg>
             </div>
         </div>
-        <div class="box-notch">
-            <div class=${classTitle}>Threshold</div>
-            <div class="box-buttons flex-col gap-2 min-w-[50%]">
-                <${Button}
-                    onClick=${()=>Dispatch({Name:"Mark", Data:true })}
-                    classes="text-md w-full"
-                    icon=${html`
+        <div class="flex-col bg-metal rounded-lg overflow-hidden shadow-md">
+            <div class="p-4">
+                <div class="box-buttons flex-col gap-2 min-w-[50%]">
+                    <${Button}
+                        onClick=${()=>Dispatch({Name:"Mark", Data:true })}
+                        classes="text-md w-full"
+                        icon=${html`
+                            <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                                <${State.Chan.Value ? Glyph.O : Glyph.X}/>
+                            </svg>`}
+                    >
+                        Accept
+                    <//>
+                    <${Button}
+                        onClick=${()=>Dispatch({Name:"Mark", Data:false})}
+                        classes="text-sm w-full"
+                        icon=${html`
+                            <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                                <${State.Chan.Value ? Glyph.O : Glyph.X}>
+                                    <${Glyph.Arrow}/>
+                                <//>
+                            </svg>`}
+                    >
+                        No Response
+                    <//>
+                    <${Button}
+                        icon=${html`
                         <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
-                            <${State.Chan.Value ? Glyph.O : Glyph.X}/>
-                        </svg>`}
-                >
-                    Accept
-                <//>
-                <${Button}
-                    onClick=${()=>Dispatch({Name:"Mark", Data:false})}
-                    classes="text-sm w-full"
-                    icon=${html`
-                        <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
-                            <${State.Chan.Value ? Glyph.O : Glyph.X}>
-                                <${Glyph.Arrow}/>
-                            <//>
-                        </svg>`}
-                >
-                    No Response
-                <//>
-                <${Button}
-                    icon=${html`
-                    <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
-                        <${Glyph.Null}/>
-                    </svg>
-                    `}
-                    onClick=${()=>Dispatch({Name:"Mark", Data:null })}
-                    classes="text-sm w-full"
-                    disabled=${State.Live.Mark == undefined}
-                >
-                    Clear
-                <//>
+                            <${Glyph.Null}/>
+                        </svg>
+                        `}
+                        onClick=${()=>Dispatch({Name:"Mark", Data:null })}
+                        classes="text-sm w-full"
+                        disabled=${State.Live.Mark == undefined}
+                    >
+                        Clear
+                    <//>
+                </div>
             </div>
         </div>
     </div>
@@ -310,8 +323,8 @@ export function Chart({children})
         );
     }
     return html`
-    <div class="relative w-full h-[800px] font(sans medium) text(xs)">
-        <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-50px)] border(1 zinc-300)">
+    <div class="relative w-full pb-[calc(55%+60px)] font(sans medium) text(xs) self-start">
+        <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-70px)] border(1 zinc-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency in Hz</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">
                 <span class="inline-block -rotate-90 origin-top -translate-x-1/2 text(sm center) font-black">

@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@0.166.0/testing/asserts.ts";
-import { Reducer, ColumnMapping, Initial } from "./src/store.js";
+import { Reducer, ColumnMapping, Initial } from "../js/store.js";
 
 let state:Store.State = {
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },

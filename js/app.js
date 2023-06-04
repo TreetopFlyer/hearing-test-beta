@@ -15,17 +15,19 @@ TW.Init(ShadowCSS, ShadowDiv);
 
 React.render(html`
     <${Store.Provider}>
-        <div class="flex justify-center">
-            <${UI.Select}/>
-        </div>
+    <div class="max-w-[1170px] mx-auto">
 
+        <${UI.Header}/>
+
+        <div class="flex flex-col items-start lg:flex-row my-4">
             <${UI.Controls}/>
-
-        <div class="flex flex-row justify-center">
             <${UI.Chart}>
                 <${UI.Audiogram}/>
             <//>
         </div>
 
+        <${UI.Display}/>
+
+    </div>
     <//>
 `, ShadowDiv);
