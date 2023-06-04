@@ -132,6 +132,7 @@ export function Reducer(inState, inAction)
             clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
             clone.Live.Freq[key] = clone.Live.Mark;
             clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            SaveTests(clone);
         }
     }
     else if( Name=="Stim" || Name=="Chan" || Name=="Freq")
@@ -159,7 +160,86 @@ export function Reducer(inState, inAction)
     return clone;
 }
 
-/** @type {Store.State} */
+
+/** @type {Store.Test[]} */
+const TestDefault = [
+    {
+        Name: "Patient A  Asymmetric Notch",
+        Plot:
+        [
+            { Hz: 500,  TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 1000, TestL: { Stim: 10, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 2000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 20, Resp: true } },
+            { Hz: 3000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 40, Resp: true } },
+            { Hz: 4000, TestL: { Stim: 40, Resp: true }, TestR: { Stim: 55, Resp: true } },
+            { Hz: 6000, TestL: { Stim: 35, Resp: true }, TestR: { Stim: 40, Resp: true } },
+            { Hz: 8000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 15, Resp: true } }
+        ]
+    },
+    {
+        Name: "Patient B High Freq Hearing Loss",
+        Plot:
+        [
+            { Hz: 500,  TestL: { Stim: 10, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 1000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 2000, TestL: { Stim: 10, Resp: true }, TestR: { Stim: 15, Resp: true } },
+            { Hz: 3000, TestL: { Stim: 25, Resp: true }, TestR: { Stim: 20, Resp: true } },
+            { Hz: 4000, TestL: { Stim: 35, Resp: true }, TestR: { Stim: 35, Resp: true } },
+            { Hz: 6000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
+            { Hz: 8000, TestL: { Stim: 80, Resp: true }, TestR: { Stim: 75, Resp: true } }
+        ]
+    },
+    {
+        Name: "Patient C Unilateral Hearing Loss",
+        Plot:
+        [
+            { Hz: 500,  TestL: { Stim: 15, Resp: true }, TestR: { Stim: 40, Resp: true } },
+            { Hz: 1000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 50, Resp: true } },
+            { Hz: 2000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 65, Resp: true } },
+            { Hz: 3000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 70, Resp: true } },
+            { Hz: 4000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 65, Resp: true } },
+            { Hz: 6000, TestL: { Stim: 25, Resp: true }, TestR: { Stim: 60, Resp: true } },
+            { Hz: 8000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 45, Resp: true } }
+        ]
+    },
+    {
+        Name: "Patient D Normal Hearing",
+        Plot:
+        [
+            { Hz: 500,  TestL: { Stim:  5, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 1000, TestL: { Stim:  0, Resp: true }, TestR: { Stim:  5, Resp: true } },
+            { Hz: 2000, TestL: { Stim:  5, Resp: true }, TestR: { Stim:  5, Resp: true } },
+            { Hz: 3000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 4000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 15, Resp: true } },
+            { Hz: 6000, TestL: { Stim:  5, Resp: true }, TestR: { Stim: 10, Resp: true } },
+            { Hz: 8000, TestL: { Stim:  0, Resp: true }, TestR: { Stim:  5, Resp: true } }
+        ]
+    }
+];
+
+/** @type {Store.Test[] | string | null } */
+let TestSaved = localStorage.getItem("app-tests");
+if(TestSaved)
+{
+    TestSaved = JSON.parse(TestSaved);
+}
+
+/**@type {(inState:Store.State)=>void} */
+const SaveTests =(inState)=> localStorage.setItem("app-tests", JSON.stringify(inState.Test));
+
+/**@type {(inState:Store.State)=>void} */
+const SaveSettings =(inState)=> localStorage.setItem("app-settings", JSON.stringify({
+    Chan:inState.Chan,
+    Freq:inState.Freq,
+    Stim:inState.Stim,
+    Show:inState.Show,
+    TestIndex:inState.TestIndex,
+}));
+
+
+/** @type {Store.Test[]} */
+const TestActual = Array.isArray(TestSaved) ? TestSaved : TestDefault
+
 export const Initial = Reducer(
 {
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
@@ -184,60 +264,7 @@ export const Initial = Reducer(
         Answer:false
     },
     TestIndex: 0,
-    Test: [
-        {
-            Name: "Patient A  Asymmetric Notch",
-            Plot:
-            [
-                { Hz: 500,  TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 10, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 2000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 20, Resp: true } },
-                { Hz: 3000, TestL: { Stim: 30, Resp: true }, TestR: { Stim: 40, Resp: true } },
-                { Hz: 4000, TestL: { Stim: 40, Resp: true }, TestR: { Stim: 55, Resp: true } },
-                { Hz: 6000, TestL: { Stim: 35, Resp: true }, TestR: { Stim: 40, Resp: true } },
-                { Hz: 8000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 15, Resp: true } }
-            ]
-        },
-        {
-            Name: "Patient B High Freq Hearing Loss",
-            Plot:
-            [
-                { Hz: 500,  TestL: { Stim: 10, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 2000, TestL: { Stim: 10, Resp: true }, TestR: { Stim: 15, Resp: true } },
-                { Hz: 3000, TestL: { Stim: 25, Resp: true }, TestR: { Stim: 20, Resp: true } },
-                { Hz: 4000, TestL: { Stim: 35, Resp: true }, TestR: { Stim: 35, Resp: true } },
-                { Hz: 6000, TestL: { Stim: 50, Resp: true }, TestR: { Stim: 55, Resp: true } },
-                { Hz: 8000, TestL: { Stim: 80, Resp: true }, TestR: { Stim: 75, Resp: true } }
-            ]
-        },
-        {
-            Name: "Patient C Unilateral Hearing Loss",
-            Plot:
-            [
-                { Hz: 500,  TestL: { Stim: 15, Resp: true }, TestR: { Stim: 40, Resp: true } },
-                { Hz: 1000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 50, Resp: true } },
-                { Hz: 2000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 65, Resp: true } },
-                { Hz: 3000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 70, Resp: true } },
-                { Hz: 4000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 65, Resp: true } },
-                { Hz: 6000, TestL: { Stim: 25, Resp: true }, TestR: { Stim: 60, Resp: true } },
-                { Hz: 8000, TestL: { Stim: 20, Resp: true }, TestR: { Stim: 45, Resp: true } }
-            ]
-        },
-        {
-            Name: "Patient D Normal Hearing",
-            Plot:
-            [
-                { Hz: 500,  TestL: { Stim:  5, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 1000, TestL: { Stim:  0, Resp: true }, TestR: { Stim:  5, Resp: true } },
-                { Hz: 2000, TestL: { Stim:  5, Resp: true }, TestR: { Stim:  5, Resp: true } },
-                { Hz: 3000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 4000, TestL: { Stim: 15, Resp: true }, TestR: { Stim: 15, Resp: true } },
-                { Hz: 6000, TestL: { Stim:  5, Resp: true }, TestR: { Stim: 10, Resp: true } },
-                { Hz: 8000, TestL: { Stim:  0, Resp: true }, TestR: { Stim:  5, Resp: true } }
-            ]
-        }
-    ]
+    Test: TestActual
 }, {Name:"Test", Data:0});
 
 
