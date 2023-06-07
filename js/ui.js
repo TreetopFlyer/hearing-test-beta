@@ -39,7 +39,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
 export const Header =()=>
 {
     const [State, Dispatch] = Store.Consumer();
-    const grade = Store.Grade(State.Live.Test);
+    const grade = State.Live.Test?.Done;
 
     /** @type {(e:Event)=>void} */
     const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
@@ -68,16 +68,14 @@ export const Header =()=>
 
         <div class="p-4">
             <div class="box-buttons flex-col w-[200px] h-full justify-center">
-                <div>Complete: ${grade.Done} of ${grade.Total}</div>
+                <div>Complete: ${grade.Marks} of ${grade.Total}</div>
                 <div class="w-full h-4 bg-zinc-400 rounded-full overflow-hidden">
-                    <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-earmark"></div>
+                    <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-earmark"></div>
                 </div>
                 <div class="text-sm">Accuracy: ${grade.Score}%</div>
-                <${Button} disabled=${grade.Done == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>
+                <${Button} disabled=${grade.Marks == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>
             </div>
         </div>
-
-
     </div>`;
 }
 

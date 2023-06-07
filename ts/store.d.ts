@@ -12,7 +12,11 @@ declare namespace Store {
     UserR?: TestFrequencySample;
   };
 
-  type Test = { Name: string; Plot: Array<TestFrequency> };
+  type Test = {
+    Name: string;
+    Done?: Grade;
+    Plot: Array<TestFrequency>
+  };
 
   type Context = {
     Test?: Test;
@@ -58,7 +62,7 @@ declare namespace Store {
 
   type Grade = {
     Total:number,
-    Done:number,
+    Marks:number,
     Score:number
   };
 }

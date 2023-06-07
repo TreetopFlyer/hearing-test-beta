@@ -28,6 +28,55 @@ export const ColumnLookup =(inFrequency)=>
 /** @type {(inDecimal:number)=>string} */
 const Perc =(inDecimal)=> `${inDecimal*100}%`;
 
+/** @type {(inTest:Store.Test)=>Store.Grade} */
+export const Grade =(inTest)=>
+{
+    /** @type {Store.Grade} */
+    const output = { Total:0, Marks:0, Score:0 };
+
+    /** @type {(inGoal:number, inResult:number)=>number} */
+    const Mapper =(inGoal, inResult)=>
+    {
+        const err = Math.abs(inGoal-inResult);
+        if(err == 0){ return 1; }
+        else if(err > 0 && err <= 5){ return 0.9; }
+        else if(err > 5 && err <= 10){ return 0.7; }
+        else if(err > 10 && err <= 15){ return 0.2; }
+        else{ return 0; }
+    }
+
+
+    for(let i=0; i<inTest.Plot.length; i++)
+    {
+        const {TestL, TestR, UserL, UserR} = inTest.Plot[i];
+        if(TestL)
+        {
+            output.Total ++;
+            if(UserL)
+            {
+                output.Marks++;
+                output.Score += Mapper(TestL.Stim, UserL.Stim);
+            }
+        }
+        if(TestR)
+        {
+            output.Total ++;
+            if(UserR)
+            {
+                output.Marks++;
+                output.Score += Mapper(TestR.Stim, UserR.Stim);
+            }
+        }
+    }
+    if(output.Marks > 0)
+    {
+        output.Score = Math.floor((output.Score/output.Marks) * 10000)/100;
+    }
+
+    return output;
+
+}
+
 /** Creates a new Store.Context object that contain the current selections 
  * @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
 const Reselect =(inState, inTest)=>
@@ -122,6 +171,7 @@ export function Reducer(inState, inAction)
                 TestL: Redraw(test, 0, clone.Stim, false),
                 TestR: Redraw(test, 1, clone.Stim, false)
             };
+            test.Done = Grade(test);
         }
     }
     else if (Name == "Mark")
@@ -132,6 +182,7 @@ export function Reducer(inState, inAction)
             clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
             clone.Live.Freq[key] = clone.Live.Mark;
             clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            clone.Live.Test.Done = Grade(clone.Live.Test);
             SaveTests(clone);
         }
     }
@@ -154,15 +205,18 @@ export function Reducer(inState, inAction)
     }
     else if (Name == "Kill")
     {
-        console.log(clone.Live.Test);
-        clone.Live.Test && clone.Live.Test.Plot.forEach(freq=>
+        if(clone.Live.Test)
         {
-            freq.UserL = undefined;
-            freq.UserR = undefined;
-        });
-        clone.Draw["UserL"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
-        clone.Draw["UserR"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
-        SaveTests(clone);
+            clone.Live.Test.Plot.forEach(freq=>
+            {
+                freq.UserL = undefined;
+                freq.UserR = undefined;
+            });
+            clone.Draw["UserL"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            clone.Draw["UserR"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+            clone.Live.Test.Done = Grade(clone.Live.Test);
+            SaveTests(clone);
+        }
     }
     else if (Name == "ShowCursor")
     {
@@ -244,13 +298,11 @@ if(TestSaved)
 const SaveTests =(inState)=> localStorage.setItem("app-tests", JSON.stringify(inState.Test));
 
 /**@type {(inState:Store.State)=>void} */
-const SaveSettings =(inState)=> localStorage.setItem("app-settings", JSON.stringify({
-    Chan:inState.Chan,
-    Freq:inState.Freq,
-    Stim:inState.Stim,
-    Show:inState.Show,
-    TestIndex:inState.TestIndex,
-}));
+const SaveSettings =(inState)=>
+{
+    const clone = {...inState, Test:null, Draw:null, };
+    localStorage.setItem("app-settings", JSON.stringify(clone));
+}
 
 
 /** @type {Store.Test[]} */
@@ -297,54 +349,3 @@ export const Provider =(props)=>
 
 /** @type {()=>Store.Binding} */
 export const Consumer =()=> React.useContext(Context);
-
-/** @type {(inTest:Store.Test|undefined)=>Store.Grade} */
-export const Grade =(inTest)=>
-{
-    /** @type {Store.Grade} */
-    const output = { Total:0, Done:0, Score:0 };
-
-    /** @type {(inGoal:number, inResult:number)=>number} */
-    const Mapper =(inGoal, inResult)=>
-    {
-        const err = Math.abs(inGoal-inResult);
-        if(err == 0){ return 1; }
-        else if(err > 0 && err <= 5){ return 0.9; }
-        else if(err > 5 && err <= 10){ return 0.7; }
-        else if(err > 10 && err <= 15){ return 0.2; }
-        else{ return 0; }
-    }
-
-    if(inTest)
-    {
-        for(let i=0; i<inTest.Plot.length; i++)
-        {
-            const {TestL, TestR, UserL, UserR} = inTest.Plot[i];
-            if(TestL)
-            {
-                output.Total ++;
-                if(UserL)
-                {
-                    output.Done++;
-                    output.Score += Mapper(TestL.Stim, UserL.Stim);
-                }
-            }
-            if(TestR)
-            {
-                output.Total ++;
-                if(UserR)
-                {
-                    output.Done++;
-                    output.Score += Mapper(TestR.Stim, UserR.Stim);
-                }
-            }
-        }
-    }
-
-    if(output.Done > 0)
-    {
-        output.Score = Math.floor((output.Score/output.Done) * 10000)/100;
-    }
-
-    return output;
-}
