@@ -148,6 +148,22 @@ export function Reducer(inState, inAction)
             clone.Live = Reselect(clone);
         }
     }
+    else if (Name == "Errs")
+    {
+        clone.Errs = Data;
+    }
+    else if (Name == "Kill")
+    {
+        console.log(clone.Live.Test);
+        clone.Live.Test && clone.Live.Test.Plot.forEach(freq=>
+        {
+            freq.UserL = undefined;
+            freq.UserR = undefined;
+        });
+        clone.Draw["UserL"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+        clone.Draw["UserR"] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
+        SaveTests(clone);
+    }
     else if (Name == "ShowCursor")
     {
         clone.Show.Cursor = Data;
@@ -245,6 +261,7 @@ export const Initial = Reducer(
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
     Freq: { Min:2,   Max:8,   Value:3,  Step:1 },
     Stim: { Min:-10, Max:120, Value:30, Step:5 },
+    Errs: 0,
     Live:
     {
         Test: undefined,

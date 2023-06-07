@@ -24,6 +24,7 @@ declare namespace Store {
     Chan: Range;
     Freq: Range;
     Stim: Range;
+    Errs: number;
     Live: Context;
     Draw: DrawChart;
     Show: {Cursor:boolean, Answer:boolean}
@@ -36,9 +37,11 @@ declare namespace Store {
   type ActionChan = { Name: "Chan"; Data: number };
   type ActionFreq = { Name: "Freq"; Data: number };
   type ActionStim = { Name: "Stim"; Data: number };
+  type ActionErrs = { Name: "Errs"; Data: number };
+  type ActionKill = { Name: "Kill"; Data: number };
   type ActionShowCursor = {Name: "ShowCursor", Data:boolean};
   type ActionShowAnswer = {Name: "ShowAnswer", Data:boolean};
-  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionShowCursor | ActionShowAnswer;
+  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionErrs | ActionKill | ActionShowCursor | ActionShowAnswer;
   type Reducer = (inState: State, inAction: Action) => State;
   type ContextUpdater = (inState: State) => boolean;
 

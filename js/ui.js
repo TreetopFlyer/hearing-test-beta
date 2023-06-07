@@ -3,7 +3,7 @@ import { html } from "htm";
 import * as Store from "./store.js";
 import * as Tone from "./tone.js";
 
-/** @typedef {({children}:{children?:preact.ComponentChildren})=>preact.VNode} BasicElement */
+/** @typedef {({children, classes}:{children?:preact.ComponentChildren, classes?:string})=>preact.VNode} BasicElement */
 
 /** @type {({children, icon, light, disabled, inactive, onClick, classes}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void, classes?:string})=>preact.VNode} */
 export function Button({children, icon, light, disabled, inactive, onClick, classes})
@@ -58,10 +58,11 @@ export const Header =()=>
                 </select>
             </div>
             <div class="box-buttons w-full mt-2">
-                <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>None<//>
-                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Slight<//>
-                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Moderate<//>
-                <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Severe<//>
+                <p>Patient Error:</p>
+                <${Button} inactive=${State.Errs == 0.0} light=${State.Errs == 0.0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.0})}>None<//>
+                <${Button} inactive=${State.Errs == 0.1} light=${State.Errs == 0.1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.1})}>Slight<//>
+                <${Button} inactive=${State.Errs == 0.3} light=${State.Errs == 0.3} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.3})}>Moderate<//>
+                <${Button} inactive=${State.Errs == 0.6} light=${State.Errs == 0.6} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.6})}>Severe<//>
             </div>
         </div>
 
@@ -72,8 +73,11 @@ export const Header =()=>
                     <div class="h-full w-[${grade.Done/grade.Total*100}%] bg-earmark"></div>
                 </div>
                 <div class="text-sm">Accuracy: ${grade.Score}%</div>
+                <${Button} disabled=${grade.Done == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>
             </div>
         </div>
+
+
     </div>`;
 }
 
@@ -323,7 +327,7 @@ export function Chart({children})
         );
     }
     return html`
-    <div class="relative w-full pb-[calc(55%+60px)] font(sans medium) text(xs) self-start">
+    <div class="relative w-full pb-[calc(55%+70px)] font(sans medium) text(xs) self-start">
         <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-70px)] border(1 zinc-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency in Hz</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">

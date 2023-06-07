@@ -23,10 +23,11 @@ React.render(html`
             <${UI.Controls}/>
             <${UI.Chart}>
                 <${UI.Audiogram}/>
+                <div class="absolute bottom-0 right-0"><${UI.Display}/></div>
             <//>
         </div>
-
-        <${UI.Display}/>
+        
+        
 
     </div>
     <//>
