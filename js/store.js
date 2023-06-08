@@ -161,7 +161,7 @@ export function Reducer(inState, inAction)
         const test = clone.Test[Data];
         if(test)
         {
-            clone.TestIndex = Data;
+            clone.Pick = Data;
             clone.Live = Reselect(clone, test);
             clone.Draw =
             {
@@ -227,6 +227,8 @@ export function Reducer(inState, inAction)
         clone.Show.Answer = Data;
     }
 
+    SaveSettings(clone);
+
     return clone;
 }
 
@@ -286,34 +288,42 @@ const TestDefault = [
         ]
     }
 ];
-
-/** @type {Store.Test[] | string | null } */
-let TestSaved = localStorage.getItem("app-tests");
-if(TestSaved)
-{
-    TestSaved = JSON.parse(TestSaved);
-}
-
+/** @type {Store.Test[]} */
+const TestActual = JSON.parse(localStorage.getItem("app-tests")||"false") || TestDefault;
 /**@type {(inState:Store.State)=>void} */
 const SaveTests =(inState)=> localStorage.setItem("app-tests", JSON.stringify(inState.Test));
 
-/**@type {(inState:Store.State)=>void} */
-const SaveSettings =(inState)=>
-{
-    const clone = {...inState, Test:null, Draw:null, };
-    localStorage.setItem("app-settings", JSON.stringify(clone));
-}
-
-
-/** @type {Store.Test[]} */
-const TestActual = Array.isArray(TestSaved) ? TestSaved : TestDefault
-
-export const Initial = Reducer(
+/** @type {Store.StatePartSimple} */
+const SettingsDefault =
 {
     Chan: { Min:0,   Max:1,   Value:0,  Step:1 },
     Freq: { Min:2,   Max:8,   Value:3,  Step:1 },
     Stim: { Min:-10, Max:120, Value:30, Step:5 },
     Errs: 0,
+    Pick: 0,
+    Show: { Cursor:true, Answer:false }
+};
+/** @type {Store.StatePartSimple} */
+const SettingsActual = JSON.parse(localStorage.getItem("app-settings")||"false") || SettingsDefault;
+/**@type {(inState:Store.State)=>void} */
+const SaveSettings =(inState)=>
+{
+    /** @type {Store.StatePartSimple} */
+    const clone = {
+        Chan:inState.Chan,
+        Freq:inState.Freq,
+        Stim:inState.Stim,
+        Errs:inState.Errs,
+        Pick:inState.Pick,
+        Show:inState.Show
+    };
+    localStorage.setItem("app-settings", JSON.stringify(clone));
+};
+
+export const Initial = Reducer(
+{
+    ...SettingsActual,
+    Test: TestActual,
     Live:
     {
         Test: undefined,
@@ -326,15 +336,8 @@ export const Initial = Reducer(
         UserR:{Points:[], Paths:[]},
         TestL:{Points:[], Paths:[]},
         TestR:{Points:[], Paths:[]}
-    },
-    Show:
-    {
-        Cursor:true,
-        Answer:false
-    },
-    TestIndex: 0,
-    Test: TestActual
-}, {Name:"Test", Data:0});
+    }
+}, {Name:"Test", Data:SettingsActual.Pick});
 
 
 export const Context = React.createContext(/** @type {Store.Binding} */([Initial, (_a)=>{}]));

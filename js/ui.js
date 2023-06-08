@@ -53,7 +53,7 @@ export const Header =()=>
 
         <div class="p-4 flex-1">
             <div class="box-buttons w-full">
-                <select id="test-select" class="w-full px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.TestIndex} onChange=${handleChange}>
+                <select id="test-select" class="w-full px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.Pick} onChange=${handleChange}>
                     ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
                 </select>
             </div>

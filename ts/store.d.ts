@@ -13,9 +13,9 @@ declare namespace Store {
   };
 
   type Test = {
-    Name: string;
+    Name : string;
     Done?: Grade;
-    Plot: Array<TestFrequency>
+    Plot : Array<TestFrequency>
   };
 
   type Context = {
@@ -24,17 +24,27 @@ declare namespace Store {
     Mark?: TestFrequencySample;
   };
   
-  type State = {
+  type StatePartSimple =
+  {
     Chan: Range;
     Freq: Range;
     Stim: Range;
     Errs: number;
+    Pick: number;
+    Show:
+    {
+      Cursor:boolean,
+      Answer:boolean
+    }
+  };
+  type StatePartComplex =
+  {
     Live: Context;
     Draw: DrawChart;
-    Show: {Cursor:boolean, Answer:boolean}
-    TestIndex: number;
     Test: Array<Test>;
   };
+
+  type State = StatePartSimple & StatePartComplex;
 
   type ActionMark = { Name: "Mark"; Data: boolean | null };
   type ActionTest = { Name: "Test"; Data: number };
