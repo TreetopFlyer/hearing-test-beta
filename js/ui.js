@@ -39,7 +39,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
 export const Header =()=>
 {
     const [State, Dispatch] = Store.Consumer();
-    const grade = State.Live.Test?.Done;
+    const grade = State.Live.Test?.Done || {Marks:0, Total:0, Score:0};
 
     /** @type {(e:Event)=>void} */
     const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
@@ -114,7 +114,26 @@ export const Controls =()=>
             if(State.Live.Freq)
             {
                 const testMark = State.Live.Freq[/** @type {"TestL"|"TestR"}*/(`Test${State.Chan.Value ? "R":"L"}`)];
-                const handler = testMark.Stim <= State.Stim.Value ? ()=>{playSet(2)} : ()=>{playSet(0)}
+                const audible = State.Stim.Value >= testMark.Stim;
+
+                const error = State.Stim.Value - testMark.Stim;
+                let errorMapped = error;
+                     if(error >= 30){ errorMapped = 0.0; }
+                else if(error >= 25){ errorMapped = 0.1; }
+                else if(error >= 20){ errorMapped = 0.2; }
+                else if(error >= 15){ errorMapped = 0.3; }
+                else if(error >= 10){ errorMapped = 0.5; }
+                else if(error >=  5){ errorMapped = 0.7; }
+                else if(error ==  0){ errorMapped = 1.0; }
+                else if(error >= -5){ errorMapped = 0.5; }
+                else if(error >=-10){ errorMapped = 0.1; }
+                else if(error >=-15){ errorMapped = 0.0; }
+
+                const errorScaled = State.Errs*errorMapped;
+                const errorSampled = Math.random() < errorScaled;
+                const percieved = errorSampled ? !audible : audible
+                const handler = percieved ? ()=>playSet(2) : ()=>playSet(0);
+                console.log("Error:", error, "Error Mapped:", errorMapped, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled);
                 timer = setTimeout(handler, 800 + Math.random()*1300);
             }
         }
@@ -129,8 +148,8 @@ export const Controls =()=>
         <div class="flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <div class="p-4 pb-1">
                 <div class="box-buttons min-w-[50%]">
-                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left Ear<//>
-                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right Ear<//>
+                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
                 </div>
             </div>
             <div class="p-4 py-1">
