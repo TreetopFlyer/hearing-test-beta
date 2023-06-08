@@ -1,15 +1,9 @@
 {
-  "compilerOptions": { "types": ["./store"], "checkJs": true },
-  "importMap": "./deno.map.json",
-  "fmt": {
-    "options": {
-      "lineWidth": 256
-    }
-  },
-  "tasks": {
-    "dev": "deno task serve & deno task test",
-    "fmt": "deno fmt --watch",
-    "serve": "deno run -A --unstable --no-check https://deno.land/std@0.167.0/http/file_server.ts",
-    "test": "deno test store.test.ts --watch --no-lock --no-check"
+  "compilerOptions": { "types": ["*.d.ts"], "checkJs": true },
+  "imports": {
+    "@twind/": "https://esm.sh/@twind/",
+    "react": "https://esm.sh/preact@10.11.3/compat",
+    "htm": "https://esm.sh/htm@3.1.1/preact",
+    "app": "./js/app.js"
   }
 }

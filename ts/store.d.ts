@@ -12,7 +12,11 @@ declare namespace Store {
     UserR?: TestFrequencySample;
   };
 
-  type Test = { Name: string; Plot: Array<TestFrequency> };
+  type Test = {
+    Name : string;
+    Done?: Grade;
+    Plot : Array<TestFrequency>
+  };
 
   type Context = {
     Test?: Test;
@@ -20,25 +24,38 @@ declare namespace Store {
     Mark?: TestFrequencySample;
   };
   
-  type State = {
+  type StatePartSimple =
+  {
     Chan: Range;
     Freq: Range;
     Stim: Range;
+    Errs: number;
+    Pick: number;
+    Show:
+    {
+      Cursor:boolean,
+      Answer:boolean
+    }
+  };
+  type StatePartComplex =
+  {
     Live: Context;
     Draw: DrawChart;
-    Show: {Cursor:boolean, Answer:boolean}
-    TestIndex: number;
     Test: Array<Test>;
   };
+
+  type State = StatePartSimple & StatePartComplex;
 
   type ActionMark = { Name: "Mark"; Data: boolean | null };
   type ActionTest = { Name: "Test"; Data: number };
   type ActionChan = { Name: "Chan"; Data: number };
   type ActionFreq = { Name: "Freq"; Data: number };
   type ActionStim = { Name: "Stim"; Data: number };
+  type ActionErrs = { Name: "Errs"; Data: number };
+  type ActionKill = { Name: "Kill"; Data: number };
   type ActionShowCursor = {Name: "ShowCursor", Data:boolean};
   type ActionShowAnswer = {Name: "ShowAnswer", Data:boolean};
-  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionShowCursor | ActionShowAnswer;
+  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionErrs | ActionKill | ActionShowCursor | ActionShowAnswer;
   type Reducer = (inState: State, inAction: Action) => State;
   type ContextUpdater = (inState: State) => boolean;
 
@@ -55,7 +72,7 @@ declare namespace Store {
 
   type Grade = {
     Total:number,
-    Done:number,
+    Marks:number,
     Score:number
   };
 }
