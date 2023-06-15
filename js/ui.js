@@ -5,8 +5,8 @@ import * as Tone from "./tone.js";
 
 /** @typedef {({children, classes}:{children?:preact.ComponentChildren, classes?:string})=>preact.VNode} BasicElement */
 
-/** @type {({children, icon, light, disabled, inactive, onClick, classes}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void, classes?:string})=>preact.VNode} */
-export function Button({children, icon, light, disabled, inactive, onClick, classes})
+/** @type {({children, icon, light, disabled, inactive, onClick, classes, classesActive}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void, classes?:string, classesActive?:string})=>preact.VNode} */
+export function Button({children, icon, light, disabled, inactive, onClick, classes, classesActive})
 {
     const [FlashGet, FlashSet] = React.useState(0);
     const handleClick =()=>
@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : "bg-earmark"} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -58,11 +58,11 @@ export const Header =()=>
                 </select>
             </div>
             <div class="box-buttons w-full mt-2">
-                <p>Patient Error:</p>
-                <${Button} inactive=${State.Errs == 0.0} light=${State.Errs == 0.0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.0})}>None<//>
-                <${Button} inactive=${State.Errs == 0.1} light=${State.Errs == 0.1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.1})}>Slight<//>
-                <${Button} inactive=${State.Errs == 0.3} light=${State.Errs == 0.3} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.3})}>Moderate<//>
-                <${Button} inactive=${State.Errs == 0.6} light=${State.Errs == 0.6} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.6})}>Severe<//>
+                <p class="px-2">Patient Reliability:</p>
+                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-[1.5] text-xs" classesActive="" onClick=${()=>Dispatch({Name:"Errs", Data:0})}>Perfect (Training Mode)<//>
+                <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="flex-1     text-xs" classesActive="bg-yellow-600" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Good<//>
+                <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="flex-1     text-xs" classesActive="bg-orange-600" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Reduced<//>
+                <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="flex-1     text-xs" classesActive="bg-red-600" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Poor<//>
             </div>
         </div>
 
@@ -95,6 +95,7 @@ export const Display =()=>
     `;
 };
 
+
 /** @type {BasicElement} */
 export const Controls =()=>
 {
@@ -113,27 +114,14 @@ export const Controls =()=>
 
             if(State.Live.Freq)
             {
-                const testMark = State.Live.Freq[/** @type {"TestL"|"TestR"}*/(`Test${State.Chan.Value ? "R":"L"}`)];
-                const audible = State.Stim.Value >= testMark.Stim;
+                const audible = State.Stim.Value >= (State.Live.Mark.Test?.Stim??0);
 
-                const error = State.Stim.Value - testMark.Stim;
-                let errorMapped = error;
-                     if(error >= 30){ errorMapped = 0.0; }
-                else if(error >= 25){ errorMapped = 0.1; }
-                else if(error >= 20){ errorMapped = 0.2; }
-                else if(error >= 15){ errorMapped = 0.3; }
-                else if(error >= 10){ errorMapped = 0.5; }
-                else if(error >=  5){ errorMapped = 0.7; }
-                else if(error ==  0){ errorMapped = 1.0; }
-                else if(error >= -5){ errorMapped = 0.5; }
-                else if(error >=-10){ errorMapped = 0.1; }
-                else if(error >=-15){ errorMapped = 0.0; }
-
-                const errorScaled = State.Errs*errorMapped;
+                const errorScaled = State.Live.Mark.Errs;
                 const errorSampled = Math.random() < errorScaled;
-                const percieved = errorSampled ? !audible : audible
+                const percieved = errorSampled ? !audible : audible;
+
                 const handler = percieved ? ()=>playSet(2) : ()=>playSet(0);
-                console.log("Error:", error, "Error Mapped:", errorMapped, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled);
+                console.log("Audible:", audible, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled, "Percieved", percieved);
                 timer = setTimeout(handler, 800 + Math.random()*1300);
             }
         }
@@ -205,6 +193,7 @@ export const Controls =()=>
                         </div>
                     </div>
                 </div>
+                <p class="text-center mt-2">Response${State.Live.Mark.Errs > 0 && ` (${State.Live.Mark.Errs*100}% Error Chance)` }:</p>
                 <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
                     <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
                     <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
@@ -267,7 +256,7 @@ export const Controls =()=>
                         `}
                         onClick=${()=>Dispatch({Name:"Mark", Data:null })}
                         classes="text-sm w-full"
-                        disabled=${State.Live.Mark == undefined}
+                        disabled=${State.Live.Mark.User == undefined}
                     >
                         Clear
                     <//>
@@ -284,9 +273,9 @@ export const Audiogram =()=>
     const [State] = Store.Consumer();
 
     const testMarksL = State.Draw.TestL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false}/>`);
-    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false} classes=${State.Live.Mark.User == p.Mark ? "stroke-bold":""}/>`);
     const testMarksR = State.Draw.TestR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} />`);
-    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} classes=${State.Live.Mark.User == p.Mark ? "stroke-bold":""}/>`);
 
     const testLinesL = State.Draw.TestL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
     const userLinesL = State.Draw.UserL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
