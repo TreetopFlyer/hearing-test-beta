@@ -59,10 +59,10 @@ export const Header =()=>
             </div>
             <div class="box-buttons w-full mt-2">
                 <p>Patient Error:</p>
-                <${Button} inactive=${State.Errs == 0.0} light=${State.Errs == 0.0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.0})}>None<//>
-                <${Button} inactive=${State.Errs == 0.1} light=${State.Errs == 0.1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.1})}>Slight<//>
-                <${Button} inactive=${State.Errs == 0.3} light=${State.Errs == 0.3} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.3})}>Moderate<//>
-                <${Button} inactive=${State.Errs == 0.6} light=${State.Errs == 0.6} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0.6})}>Severe<//>
+                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0})}>None<//>
+                <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Slight<//>
+                <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Moderate<//>
+                <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Severe<//>
             </div>
         </div>
 
@@ -95,6 +95,18 @@ export const Display =()=>
     `;
 };
 
+
+const ErrorCol = 
+    [30,   25,   20,   15,   10,   5,    0,    -5,   -10,  -15 ]
+const ErrorLUT = [
+    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.10, 0.15, 0.10, 0.10, 0.00, 0.00],
+    [0.00, 0.00, 0.02, 0.05, 0.15, 0.20, 0.30, 0.15, 0.05, 0.00],
+    [0.00, 0.02, 0.05, 0.10, 0.20, 0.40, 0.60, 0.30, 0.05, 0.00]
+];
+/** @type {(inDelta:number, inPatentError:number)=>number} */
+const ErrorProbability =(inDelta, inPatentError)=> ErrorLUT[inPatentError]?.[ErrorCol.indexOf(inDelta)] ?? 0;
+
 /** @type {BasicElement} */
 export const Controls =()=>
 {
@@ -116,24 +128,12 @@ export const Controls =()=>
                 const testMark = State.Live.Freq[/** @type {"TestL"|"TestR"}*/(`Test${State.Chan.Value ? "R":"L"}`)];
                 const audible = State.Stim.Value >= testMark.Stim;
 
-                const error = State.Stim.Value - testMark.Stim;
-                let errorMapped = error;
-                     if(error >= 30){ errorMapped = 0.0; }
-                else if(error >= 25){ errorMapped = 0.1; }
-                else if(error >= 20){ errorMapped = 0.2; }
-                else if(error >= 15){ errorMapped = 0.3; }
-                else if(error >= 10){ errorMapped = 0.5; }
-                else if(error >=  5){ errorMapped = 0.7; }
-                else if(error ==  0){ errorMapped = 1.0; }
-                else if(error >= -5){ errorMapped = 0.5; }
-                else if(error >=-10){ errorMapped = 0.1; }
-                else if(error >=-15){ errorMapped = 0.0; }
-
-                const errorScaled = State.Errs*errorMapped;
+                const errorScaled = ErrorProbability(State.Stim.Value - testMark.Stim, State.Errs);
                 const errorSampled = Math.random() < errorScaled;
-                const percieved = errorSampled ? !audible : audible
+                const percieved = errorSampled ? !audible : audible;
+
                 const handler = percieved ? ()=>playSet(2) : ()=>playSet(0);
-                console.log("Error:", error, "Error Mapped:", errorMapped, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled);
+                console.log("Audible:", audible, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled, "Percieved", percieved);
                 timer = setTimeout(handler, 800 + Math.random()*1300);
             }
         }
