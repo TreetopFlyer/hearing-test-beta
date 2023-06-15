@@ -25,6 +25,7 @@ declare namespace Store {
     {
       User?: TestFrequencySample,
       Test?: TestFrequencySample,
+      Errs : number
     }
   };
   

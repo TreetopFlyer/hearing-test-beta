@@ -77,6 +77,23 @@ export const Grade =(inTest)=>
 
 }
 
+
+const ErrorCol = 
+    [30,   25,   20,   15,   10,   5,    0,    -5,   -10,  -15 ]
+const ErrorLUT = [
+    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
+    [0.00, 0.00, 0.00, 0.00, 0.10, 0.15, 0.10, 0.10, 0.00, 0.00],
+    [0.00, 0.00, 0.02, 0.05, 0.15, 0.20, 0.30, 0.15, 0.05, 0.00],
+    [0.00, 0.02, 0.05, 0.10, 0.20, 0.40, 0.60, 0.30, 0.05, 0.00]
+];
+/** @type {(inState:Store.State)=>void} */
+const ErrorProbability =(inState)=>
+{
+    const miss = inState.Stim.Value - (inState.Live.Mark.Test?.Stim ?? inState.Stim.Value);
+    inState.Live.Mark.Errs = ErrorLUT[inState.Errs]?.[ErrorCol.indexOf(miss)] ?? 0;
+}
+
+
 /** Creates a new Store.Context object that contain the current selections 
  * @type {(inState:Store.State, inTest?:Store.Test)=>Store.Context} */
 const Reselect =(inState, inTest)=>
@@ -228,6 +245,7 @@ export function Reducer(inState, inAction)
         clone.Show.Answer = Data;
     }
 
+    ErrorProbability(clone);
     SaveSettings(clone);
 
     return clone;

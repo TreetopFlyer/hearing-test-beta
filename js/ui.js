@@ -96,17 +96,6 @@ export const Display =()=>
 };
 
 
-const ErrorCol = 
-    [30,   25,   20,   15,   10,   5,    0,    -5,   -10,  -15 ]
-const ErrorLUT = [
-    [0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00],
-    [0.00, 0.00, 0.00, 0.00, 0.10, 0.15, 0.10, 0.10, 0.00, 0.00],
-    [0.00, 0.00, 0.02, 0.05, 0.15, 0.20, 0.30, 0.15, 0.05, 0.00],
-    [0.00, 0.02, 0.05, 0.10, 0.20, 0.40, 0.60, 0.30, 0.05, 0.00]
-];
-/** @type {(inDelta:number, inPatentError:number)=>number} */
-const ErrorProbability =(inDelta, inPatentError)=> ErrorLUT[inPatentError]?.[ErrorCol.indexOf(inDelta)] ?? 0;
-
 /** @type {BasicElement} */
 export const Controls =()=>
 {
@@ -125,10 +114,9 @@ export const Controls =()=>
 
             if(State.Live.Freq)
             {
-                const testMark = State.Live.Freq[/** @type {"TestL"|"TestR"}*/(`Test${State.Chan.Value ? "R":"L"}`)];
-                const audible = State.Stim.Value >= testMark.Stim;
+                const audible = State.Stim.Value >= (State.Live.Mark.Test?.Stim??0);
 
-                const errorScaled = ErrorProbability(State.Stim.Value - testMark.Stim, State.Errs);
+                const errorScaled = State.Live.Mark.Errs;
                 const errorSampled = Math.random() < errorScaled;
                 const percieved = errorSampled ? !audible : audible;
 
@@ -205,6 +193,7 @@ export const Controls =()=>
                         </div>
                     </div>
                 </div>
+                <p class="text-center mt-2">Response${State.Live.Mark.Errs > 0 && ` (${State.Live.Mark.Errs*100}% Error Chance)` }:</p>
                 <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
                     <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
                     <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
