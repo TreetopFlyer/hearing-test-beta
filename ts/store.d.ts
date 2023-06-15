@@ -21,7 +21,11 @@ declare namespace Store {
   type Context = {
     Test?: Test;
     Freq?: TestFrequency;
-    Mark?: TestFrequencySample;
+    Mark:
+    {
+      User?: TestFrequencySample,
+      Test?: TestFrequencySample,
+    }
   };
   
   type StatePartSimple =

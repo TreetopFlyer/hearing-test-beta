@@ -267,7 +267,7 @@ export const Controls =()=>
                         `}
                         onClick=${()=>Dispatch({Name:"Mark", Data:null })}
                         classes="text-sm w-full"
-                        disabled=${State.Live.Mark == undefined}
+                        disabled=${State.Live.Mark.User == undefined}
                     >
                         Clear
                     <//>
@@ -284,9 +284,9 @@ export const Audiogram =()=>
     const [State] = Store.Consumer();
 
     const testMarksL = State.Draw.TestL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false}/>`);
-    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+    const userMarksL = State.Draw.UserL.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${false} classes=${State.Live.Mark.User == p.Mark ? "stroke-bold":""}/>`);
     const testMarksR = State.Draw.TestR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} />`);
-    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} classes=${State.Live.Mark == p.Mark ? "stroke-bold":""}/>`);
+    const userMarksR = State.Draw.UserR.Points.map(p=>html`<${Mark} x=${p.X} y=${p.Y} response=${p.Mark?.Resp} right=${true} classes=${State.Live.Mark.User == p.Mark ? "stroke-bold":""}/>`);
 
     const testLinesL = State.Draw.TestL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);
     const userLinesL = State.Draw.UserL.Paths.map( p=>html`<line class="opacity-60" x1=${p.Head.X} y1=${p.Head.Y} x2=${p.Tail.X} y2=${p.Tail.Y} />`);

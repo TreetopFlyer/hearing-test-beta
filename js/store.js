@@ -82,7 +82,7 @@ export const Grade =(inTest)=>
 const Reselect =(inState, inTest)=>
 {
     /** @type {Store.Context} */
-    const output = { Test:inTest??inState.Live.Test };
+    const output = { Test:inTest??inState.Live.Test, Mark:{User:undefined} };
     const column = ColumnMapping[inState.Freq.Value];
     if(column && output.Test)
     {
@@ -93,7 +93,8 @@ const Reselect =(inState, inTest)=>
             if(plot.Hz == hz)
             {
                 output.Freq = plot;
-                output.Mark = inState.Chan.Value ? plot.UserR : plot.UserL;
+                output.Mark.User = inState.Chan.Value ? plot.UserR : plot.UserL;
+                output.Mark.Test = inState.Chan.Value ? plot.TestR : plot.TestL;
                 break;
             }
         }
@@ -179,8 +180,8 @@ export function Reducer(inState, inAction)
         if(clone.Live.Test && clone.Live.Freq)
         {
             const key = clone.Chan.Value == 0 ? "UserL" : "UserR";
-            clone.Live.Mark = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
-            clone.Live.Freq[key] = clone.Live.Mark;
+            clone.Live.Mark.User = Data !== null ? {Stim:clone.Stim.Value, Resp:Data} : undefined;
+            clone.Live.Freq[key] = clone.Live.Mark.User;
             clone.Draw[key] = Redraw(clone.Live.Test, clone.Chan.Value, clone.Stim, true);
             clone.Live.Test.Done = Grade(clone.Live.Test);
             SaveTests(clone);
@@ -328,7 +329,7 @@ export const Initial = Reducer(
     {
         Test: undefined,
         Freq: undefined,
-        Mark: undefined
+        Mark: {User: undefined}
     },
     Draw:
     {
