@@ -5,8 +5,8 @@ import * as Tone from "./tone.js";
 
 /** @typedef {({children, classes}:{children?:preact.ComponentChildren, classes?:string})=>preact.VNode} BasicElement */
 
-/** @type {({children, icon, light, disabled, inactive, onClick, classes}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void, classes?:string})=>preact.VNode} */
-export function Button({children, icon, light, disabled, inactive, onClick, classes})
+/** @type {({children, icon, light, disabled, inactive, onClick, classes, classesActive}:{children:preact.VNode, icon?:preact.VNode, light:boolean, disabled:boolean, inactive:boolean, onClick:()=>void, classes?:string, classesActive?:string})=>preact.VNode} */
+export function Button({children, icon, light, disabled, inactive, onClick, classes, classesActive})
 {
     const [FlashGet, FlashSet] = React.useState(0);
     const handleClick =()=>
@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : "bg-earmark"} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black font-sans group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -58,11 +58,11 @@ export const Header =()=>
                 </select>
             </div>
             <div class="box-buttons w-full mt-2">
-                <p>Patient Error:</p>
-                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:0})}>None<//>
-                <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Slight<//>
-                <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Moderate<//>
-                <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Severe<//>
+                <p class="px-2">Patient Reliability:</p>
+                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-[1.5] text-xs" classesActive="" onClick=${()=>Dispatch({Name:"Errs", Data:0})}>Perfect (Training Mode)<//>
+                <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="flex-1     text-xs" classesActive="bg-yellow-600" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Good<//>
+                <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="flex-1     text-xs" classesActive="bg-orange-600" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Reduced<//>
+                <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="flex-1     text-xs" classesActive="bg-red-600" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Poor<//>
             </div>
         </div>
 
