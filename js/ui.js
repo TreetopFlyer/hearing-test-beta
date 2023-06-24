@@ -59,7 +59,7 @@ export const Header =()=>
             </div>
             <div class="box-buttons w-full mt-2">
                 <p class="px-2">Patient Reliability:</p>
-                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-[1.5] text-xs" classesActive="" onClick=${()=>Dispatch({Name:"Errs", Data:0})}>Perfect (Training Mode)<//>
+                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="flex-[1.5] text-xs" classesActive="" onClick=${()=>Dispatch({Name:"Errs", Data:0})}><strong class="mr-1">Perfect</strong><span>(Training Mode)</span><//>
                 <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="flex-1     text-xs" classesActive="bg-yellow-600" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Good<//>
                 <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="flex-1     text-xs" classesActive="bg-orange-600" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Reduced<//>
                 <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="flex-1     text-xs" classesActive="bg-red-600" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Poor<//>
@@ -68,7 +68,7 @@ export const Header =()=>
 
         <div class="p-4">
             <div class="box-buttons flex-col w-[200px] h-full justify-center">
-                <div>Complete: ${grade.Marks} of ${grade.Total}</div>
+                <div><strong>Complete: ${grade.Marks} of ${grade.Total}</strong></div>
                 <div class="w-full h-4 bg-zinc-400 rounded-full overflow-hidden">
                     <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-earmark"></div>
                 </div>
@@ -87,6 +87,7 @@ export const Display =()=>
     <div class="flex justify-end">
         <div class="bg-metal rounded-lg overflow-hidden shadow-md p-4">
             <div class="box-buttons">
+                <p>Toggle Overlay</p>
                 <${Button} light=${State.Show.Cursor} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowCursor", Data:!State.Show.Cursor})}>Cursor<//>
                 <${Button} light=${State.Show.Answer} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowAnswer", Data:!State.Show.Answer})}>Answer<//>
             </div>
@@ -142,7 +143,10 @@ export const Controls =()=>
             </div>
             <div class="p-4 py-1">
                 <div class="box-buttons min-w-[50%]">
-                    <div class="flex-1 text-center text-shadow-lcd"><strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz</div>
+                    <div class="flex-1 text-center text-shadow-lcd">
+                        <p class="text-xs">Frequency</p>
+                        <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz
+                    </div>
                     <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
                         <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
                             <${Glyph.Minus}/>
@@ -157,7 +161,10 @@ export const Controls =()=>
             </div>
             <div class="p-4 pt-2">
                 <div class="box-buttons min-w-[50%]">
-                    <div class="flex-1 text-center text-shadow-lcd"><strong>${State.Stim.Value}</strong> dbHL</div>
+                    <div class="flex-1 text-center text-shadow-lcd">
+                        <p class="text-xs">Level</p>
+                        <strong>${State.Stim.Value}</strong> dbHL
+                    </div>
                     <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
                     <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
                             <${Glyph.Minus}/>
@@ -177,6 +184,10 @@ export const Controls =()=>
             <div class="p-4 pb-0">
                 <div class="box-buttons flex-1">
                     <div class="flex-1">
+                        <div class="flex gap-1 mb-2">
+                            <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
+                            <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
+                        </div>
                         <${Button}
                             classes="w-full flex-1 self-center"
                             onClick=${()=>playSet(1)}
@@ -187,13 +198,11 @@ export const Controls =()=>
                         >
                             <span class="py-2">Present Tone</span>
                         <//>
-                        <div class="flex gap-1 mt-2">
-                            <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
-                            <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
-                        </div>
                     </div>
                 </div>
-                <p class="text-center mt-2">Response${State.Live.Mark.Errs > 0 && ` (${State.Live.Mark.Errs*100}% Error Chance)` }:</p>
+                <p class="text-center mt-2">
+                    <strong>Response</strong> <span class="text-xs">${State.Live.Mark.Errs > 0 && ` (${State.Live.Mark.Errs*100}% Error Chance)` }</span>:
+                </p>
                 <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
                     <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
                     <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
@@ -226,6 +235,7 @@ export const Controls =()=>
         <div class="flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <div class="p-4">
                 <div class="box-buttons flex-col gap-2 min-w-[50%]">
+                    <strong>Threshold</strong>
                     <${Button}
                         onClick=${()=>Dispatch({Name:"Mark", Data:true })}
                         classes="text-md w-full"
@@ -335,7 +345,7 @@ export function Chart({children})
     return html`
     <div class="relative w-full pb-[calc(55%+70px)] font(sans medium) text(xs) self-start">
         <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-70px)] border(1 zinc-300)">
-            <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency in Hz</span>
+            <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency (Hz)</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">
                 <span class="inline-block -rotate-90 origin-top -translate-x-1/2 text(sm center) font-black">
                     Hearing Level (dbHL)
