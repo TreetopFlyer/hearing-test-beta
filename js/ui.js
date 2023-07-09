@@ -35,6 +35,8 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     </button>`;
 }
 
+const staticPath = await import.meta.resolve("$/");
+
 /** @type {BasicElement} */
 export const Header =()=>
 {
@@ -48,7 +50,7 @@ export const Header =()=>
     <div class="flex flex-row items-stretch bg-metal rounded-lg overflow-hidden shadow-md font-sans">
 
         <div class="p-4">
-            <img class="h-auto max-w-[200px]" src="./logo.png"/>
+            <img class="h-auto max-w-[200px]" src=${staticPath+"logo.png"}/>
         </div>
 
         <div class="p-4 flex-1">

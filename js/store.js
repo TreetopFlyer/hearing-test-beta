@@ -99,7 +99,7 @@ const ErrorProbability =(inState)=>
 const Reselect =(inState, inTest)=>
 {
     /** @type {Store.Context} */
-    const output = { Test:inTest??inState.Live.Test, Mark:{User:undefined} };
+    const output = { Test:inTest??inState.Live.Test, Mark:{User:undefined, Errs:0} };
     const column = ColumnMapping[inState.Freq.Value];
     if(column && output.Test)
     {
@@ -190,6 +190,7 @@ export function Reducer(inState, inAction)
                 TestR: Redraw(test, 1, clone.Stim, false)
             };
             test.Done = Grade(test);
+            SaveTests(clone);
         }
     }
     else if (Name == "Mark")
@@ -248,6 +249,7 @@ export function Reducer(inState, inAction)
     ErrorProbability(clone);
     SaveSettings(clone);
 
+    document.dispatchEvent(new CustomEvent("EarmarkUpdate", {detail:clone}));
     return clone;
 }
 
@@ -307,10 +309,41 @@ const TestDefault = [
         ]
     }
 ];
+
+let PreviewData = false;
+const PreviewText = atob(new URL(window.location.href).searchParams.get("test")||"");
+if(PreviewText)
+{
+    try
+    {
+        PreviewData = JSON.parse(PreviewText);
+    }
+    catch(e)
+    {
+        alert(`Could not read test data`);
+        PreviewData = false;
+    }    
+}
+
+const AppVersion = `0.0.0`;
+const savedVersion = localStorage.getItem("app-version");
+if(savedVersion && (AppVersion > savedVersion))
+{
+    console.log(`New version "${AppVersion}"; clearing saved session.`);
+    localStorage.clear();
+}
+localStorage.setItem("app-version", AppVersion);
+
 /** @type {Store.Test[]} */
-const TestActual = JSON.parse(localStorage.getItem("app-tests")||"false") || TestDefault;
+const TestActual = PreviewData ? PreviewData : JSON.parse(localStorage.getItem("app-tests")||"false") || TestDefault;
 /**@type {(inState:Store.State)=>void} */
-const SaveTests =(inState)=> localStorage.setItem("app-tests", JSON.stringify(inState.Test));
+const SaveTests =(inState)=>
+{
+    if(!PreviewData)
+    {
+        localStorage.setItem("app-tests", JSON.stringify(inState.Test));
+    }
+}
 
 /** @type {Store.StatePartSimple} */
 const SettingsDefault =
@@ -323,20 +356,23 @@ const SettingsDefault =
     Show: { Cursor:true, Answer:false }
 };
 /** @type {Store.StatePartSimple} */
-const SettingsActual = JSON.parse(localStorage.getItem("app-settings")||"false") || SettingsDefault;
+const SettingsActual = PreviewData ? SettingsDefault : JSON.parse(localStorage.getItem("app-settings")||"false") || SettingsDefault;
 /**@type {(inState:Store.State)=>void} */
 const SaveSettings =(inState)=>
 {
-    /** @type {Store.StatePartSimple} */
-    const clone = {
-        Chan:inState.Chan,
-        Freq:inState.Freq,
-        Stim:inState.Stim,
-        Errs:inState.Errs,
-        Pick:inState.Pick,
-        Show:inState.Show
-    };
-    localStorage.setItem("app-settings", JSON.stringify(clone));
+    if(!PreviewData)
+    {
+        /** @type {Store.StatePartSimple} */
+        const clone = {
+            Chan:inState.Chan,
+            Freq:inState.Freq,
+            Stim:inState.Stim,
+            Errs:inState.Errs,
+            Pick:inState.Pick,
+            Show:inState.Show
+        };
+        localStorage.setItem("app-settings", JSON.stringify(clone));      
+    }
 };
 
 export const Initial = Reducer(
@@ -347,7 +383,7 @@ export const Initial = Reducer(
     {
         Test: undefined,
         Freq: undefined,
-        Mark: {User: undefined}
+        Mark: {User: undefined, Errs:0}
     },
     Draw:
     {
