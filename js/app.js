@@ -15,19 +15,20 @@ TW.Init(ShadowCSS, ShadowDiv);
 
 React.render(html`
     <${Store.Provider}>
-    <div class="max-w-[1170px] mx-auto">
+    <div class="max-w-[1170px] mx-auto font-sans">
 
         <${UI.Header}/>
 
-        <div class="flex flex-col items-start lg:flex-row my-4">
+        <div class="flex flex-col items-start lg:flex-row mt-4 mb-24">
             <${UI.Controls}/>
             <${UI.Chart}>
                 <${UI.Audiogram}/>
-                <div class="absolute bottom-0 right-0"><${UI.Display}/></div>
+                <div class="absolute left-0 w-full top-full md:(w-[300px] left-auto top-auto -right-[10px] -bottom-[10px])">
+                    <${UI.Display}/>
+                </div>
             <//>
+
         </div>
-        
-        
 
     </div>
     <//>
