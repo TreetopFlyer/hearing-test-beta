@@ -15,7 +15,7 @@ TW.Init(ShadowCSS, ShadowDiv);
 
 React.render(html`
     <${Store.Provider}>
-    <div class="max-w-[1170px] mx-auto font-sans">
+    <div class="max-w-[1270px] mx-auto font-sans text-[16px] text-black">
 
         <${UI.Header}/>
 
