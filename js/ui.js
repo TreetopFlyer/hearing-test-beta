@@ -350,7 +350,7 @@ export function Chart({children})
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency (Hz)</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">
                 <span class="inline-block -rotate-90 origin-top -translate-x-1/2 text(sm center) font-black">
-                    Hearing Level (dbHL)
+                    Hearing Level (dBHL)
                 </span>
             </span>
             <div class=${`relative top-[${inset}px] left-[${inset}px] w-[calc(100%-${inset*2}px)] h-[calc(100%-${inset*2}px)]`}>
