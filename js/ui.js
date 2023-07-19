@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch rounded-md text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch shadow-sss rounded-md text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -28,7 +28,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
             <span class="absolute top-0 left-0 w-full h-full bg-black rounded(tl-lg bl-lg) ${disabled ? "opacity-20" : "opacity-50"}"></span>
             <span class="relative">${icon}</span>
         </span>` }
-        <div class="flex-1 flex items-center justify-center text-center px-3 py-2 relative border-l(1 [#ffffff22])">
+        <div class="flex-1 flex items-center justify-center text-center font-bold px-3 py-2 relative border-l(1 [#ffffff22])">
             <span class="absolute shadow-glow-yellow-500 top-0 left-1/2 w-6 h-[6px] bg-white rounded-full translate(-x-1/2 -y-1/2) transition-all duration-500 ${light ? "opacity-100" : "opacity-0 scale-y-0"}"></span>
             ${children}
         </div>
@@ -137,22 +137,22 @@ export const Controls =()=>
     const classTitle = "flex-1 text-sm"
 
     return html`
-    <div class="grid grid-cols-6 gap-x-4 gap-y-8 w-full lg:w-[450px]">
+    <div class="grid grid-cols-6 gap-4 w-full lg:w-[370px]">
 
         <div class="col-start-1 col-end-7 md:col-end-4 lg:col-end-7  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Controls</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>
             <div class="p-4 pb-1">
                 <div class="box-buttons min-w-[50%]">
-                    <p class="text(sm shadow-lcd) mx-2">Channel</p>
+                    <p class="text(sm ) mx-2">Channel</p>
                     <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
                     <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
                 </div>
             </div>
             <div class="p-4 py-1">
                 <div class="box-buttons min-w-[50%]">
-                    <div class="flex-1 text-center text-shadow-lcd">
-                        <p class="text-sm">Frequency <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz </p>
+                    <div class="flex-1 text-center">
+                        <p class="text-sm">Frequency <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> (Hz) </p>
                     </div>
                     <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
                         <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
@@ -168,8 +168,8 @@ export const Controls =()=>
             </div>
             <div class="p-4 pt-2">
                 <div class="box-buttons min-w-[50%]">
-                    <div class="flex-1 text-center text-shadow-lcd">
-                        <p class="text-sm">Level <strong>${State.Stim.Value}</strong> dBHL</p>
+                    <div class="flex-1 text-center">
+                        <p class="text-sm">Hearing Level <strong>${State.Stim.Value}</strong> (dBHL)</p>
                     </div>
                     <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
                     <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
@@ -204,12 +204,12 @@ export const Controls =()=>
                                     <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
                                 </svg>`}
                             >
-                                <span class="py-2">Present Tone</span>
+                                <span class="py-2 text-sm leading-none">Present Tone</span>
                             <//>
                         </div>
                     </div>
-                    <div class="md:pl-2">
-                        <p class="text(center sm) mt-2 -mb-2 font-bold">Response:</p>
+                    <div class="">
+                        <p class="text(center sm shadow-emboss) mt-2 -mb-2 font-bold">Response:</p>
                         <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
                             <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
                             <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
@@ -271,7 +271,7 @@ export const Controls =()=>
                     <//>
                     <${Button}
                         onClick=${()=>Dispatch({Name:"Mark", Data:false})}
-                        classes="text-sm flex-1 leading-none"
+                        classes="mt-1 text-xs flex-1 leading-none"
                         icon=${html`
                             <svg class="h-[6px] w-[6px] overflow-visible stroke(white 2)">
                                 <${State.Chan.Value ? Glyph.O : Glyph.X}>
@@ -355,7 +355,7 @@ export function Chart({children})
     }
     return html`
     <div class="relative w-full pb-[calc(90%+70px)] md:pb-[calc(65%+70px)] lg:pb-[calc(45%+70px)] font(sans medium) text(xs) self-start">
-        <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-70px)] border(1 zinc-300)">
+        <div class="absolute right-0 bottom-0 w-[calc(100%-80px)] h-[calc(100%-70px)] border(1 zinc-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency (Hz)</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">
                 <span class="inline-block -rotate-90 origin-top -translate-x-1/2 text(sm center) font-black">

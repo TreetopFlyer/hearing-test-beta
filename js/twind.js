@@ -67,7 +67,7 @@ export const Configure = {
         [
             'shadow-sss',
             {
-                "box-shadow": "rgb(0 0 0 / 50%) 0px -2px 3px inset, rgb(255 255 255 / 50%) 0px 10px 10px inset"
+                "box-shadow": "rgb(0 0 0 / 30%) 0px -2px 3px inset, rgb(255 255 255 / 10%) 0px 10px 10px inset"
             }
         ],
         [
