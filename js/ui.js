@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch rounded-lg text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch rounded-md text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -137,28 +137,30 @@ export const Controls =()=>
     const classTitle = "flex-1 text-sm"
 
     return html`
-    <div class="grid grid-cols-6 gap-4 w-full lg:w-[300px]">
+    <div class="grid grid-cols-6 gap-x-4 gap-y-8 w-full lg:w-[450px]">
 
         <div class="col-start-1 col-end-7 md:col-end-4 lg:col-end-7  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
+            <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Controls</p>
+            <div class="border-y-1 border-t-slate-300 border-b-white"></div>
             <div class="p-4 pb-1">
                 <div class="box-buttons min-w-[50%]">
-                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
-                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
+                    <p class="text(sm shadow-lcd) mx-2">Channel</p>
+                    <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
+                    <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
                 </div>
             </div>
             <div class="p-4 py-1">
                 <div class="box-buttons min-w-[50%]">
                     <div class="flex-1 text-center text-shadow-lcd">
-                        <p class="text-xs">Frequency</p>
-                        <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz
+                        <p class="text-sm">Frequency <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> Hz </p>
                     </div>
                     <${Button} disabled=${State.Freq.Value == State.Freq.Min} onClick=${()=>Dispatch({Name:"Freq", Data:-1})}>
-                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
                             <${Glyph.Minus}/>
                         </svg>
                     <//>
                     <${Button} disabled=${State.Freq.Value == State.Freq.Max} onClick=${()=>Dispatch({Name:"Freq", Data:1})}>
-                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
                             <${Glyph.Plus}/>
                         </svg>
                     <//>
@@ -167,16 +169,15 @@ export const Controls =()=>
             <div class="p-4 pt-2">
                 <div class="box-buttons min-w-[50%]">
                     <div class="flex-1 text-center text-shadow-lcd">
-                        <p class="text-xs">Level</p>
-                        <strong>${State.Stim.Value}</strong> dbHL
+                        <p class="text-sm">Level <strong>${State.Stim.Value}</strong> dBHL</p>
                     </div>
                     <${Button} disabled=${State.Stim.Value == State.Stim.Min} onClick=${()=>Dispatch({Name:"Stim", Data:-1})}>
-                    <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                    <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
                             <${Glyph.Minus}/>
                         </svg>
                     <//>
                     <${Button} disabled=${State.Stim.Value == State.Stim.Max} onClick=${()=>Dispatch({Name:"Stim", Data:1})}>
-                        <svg class="my-1 h-3 w-3 overflow-visible stroke(white 2)">
+                        <svg class="my-1 h-2 w-2 overflow-visible stroke(white 2)">
                             <${Glyph.Plus}/>
                         </svg>
                     <//>
@@ -185,95 +186,100 @@ export const Controls =()=>
         </div>
 
         <div class="col-start-1 col-end-7 md:col-start-4 lg:col-start-1  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
-            <div class="p-4 pb-0">
+            <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Tone</p>
+            <div class="border-y-1 border-t-slate-300 border-b-white"></div>
+            <div class="p-4">
                 <div class="box-buttons flex-1">
                     <div class="flex-1">
                         <div class="flex gap-1 mb-2">
                             <${Button} onClick=${()=>{pulsedSet(true )}} light=${pulsedGet } inactive${pulsedGet } classes="flex-1 text(center xs)">Pulsed    <//>
                             <${Button} onClick=${()=>{pulsedSet(false)}} light=${!pulsedGet} inactive${!pulsedGet} classes="flex-1 text(center xs)">Continuous<//>
                         </div>
-                        <${Button}
-                            classes="w-full flex-1 self-center"
-                            onClick=${()=>playSet(1)}
-                            disabled=${playGet==1}
-                            icon=${html`<svg class="w-3 h-3 mx-1" viewBox="0 0 20 20">
-                                <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
-                            </svg>`}
-                        >
-                            <span class="py-2">Present Tone</span>
-                        <//>
+                        <div class="flex items-start">
+                            <${Button}
+                                classes="w-full flex-2"
+                                onClick=${()=>playSet(1)}
+                                disabled=${playGet==1}
+                                icon=${html`<svg class="w-3 h-3 mx-1" viewBox="0 0 20 20">
+                                    <polygon points="0,0 20,10 0,20" fill="#ffffff" stroke="none"></polygon>
+                                </svg>`}
+                            >
+                                <span class="py-2">Present Tone</span>
+                            <//>
+                        </div>
+                    </div>
+                    <div class="md:pl-2">
+                        <p class="text(center sm) mt-2 -mb-2 font-bold">Response:</p>
+                        <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
+                            <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
+                            <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
+                            <circle fill="url(#metal)" cx="39" cy="40" r="27"></circle>
+                            <circle fill="url(#backwall)" cx="39" cy="40" r="25"></circle>
+                            <ellipse fill="url(#clearcoat)" cx="39" cy="33" rx="20" ry="16"></ellipse>
+                            ${playGet == 2 && html`<circle fill="url(#light)" cx="39.5" cy="39.5" r="36" class="animate-pulse"></circle>`}
+                            <defs>
+                                <linearGradient id="metal" x1="39.5" y1="1" x2="39.5" y2="78" gradientUnits="userSpaceOnUse">
+                                    <stop offset="0.0" stop-color="#C4C4C4" stop-opacity="1.0"></stop>
+                                    <stop offset="1.0" stop-color="#F2F2F2" stop-opacity="1.0"></stop>
+                                </linearGradient>
+                                <radialGradient id="backwall" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 56) rotate(-90) scale(45.5 74.4907)">
+                                    <stop offset="0.0" stop-color="#AAAAAA" stop-opacity="1.0"></stop>
+                                    <stop offset="1.0" stop-color="#333333" stop-opacity="1.0"></stop>
+                                </radialGradient>
+                                <radialGradient id="clearcoat" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 38.5) rotate(90) scale(50.5 71.9394)">
+                                    <stop offset="0.0" stop-color="#ffffff" stop-opacity="0.0"></stop>
+                                    <stop offset="0.7" stop-color="#ffffff" stop-opacity="1.0"></stop>
+                                </radialGradient>
+                                <radialGradient id="light" cx="0" cy="0" r="1.0" gradientUnits="userSpaceOnUse" gradientTransform="translate(39.5 39.5) rotate(90) scale(39.5)">
+                                    <stop offset="0.2" stop-color="#ffffff" stop-opacity="1.0"></stop>
+                                    <stop offset="0.5" stop-color="#ff8800" stop-opacity="1.6"></stop>
+                                    <stop offset="0.9" stop-color="#ffffff" stop-opacity="0.0"></stop>
+                                </radialGradient>
+                            </defs>
+                        </svg>
                     </div>
                 </div>
-                <p class="text-center mt-2">
-                    <strong>Response</strong> <span class="text-xs">${State.Live.Mark.Errs > 0 && ` (${State.Live.Mark.Errs*100}% Error Chance)` }</span>:
-                </p>
-                <svg width="80" height="80" preserveAspectRatio="none" viewBox="0 0 79 79" fill="none" class="mx-auto mt-2">
-                    <circle fill="url(#metal)" cx="39" cy="40" r="35"></circle>
-                    <circle fill="url(#metal)" cx="39.5" cy="39.5" r="29.5" transform="rotate(180 39.5 39.5)"></circle>
-                    <circle fill="url(#metal)" cx="39" cy="40" r="27"></circle>
-                    <circle fill="url(#backwall)" cx="39" cy="40" r="25"></circle>
-                    <ellipse fill="url(#clearcoat)" cx="39" cy="33" rx="20" ry="16"></ellipse>
-                    ${playGet == 2 && html`<circle fill="url(#light)" cx="39.5" cy="39.5" r="36" class="animate-pulse"></circle>`}
-                    <defs>
-                        <linearGradient id="metal" x1="39.5" y1="1" x2="39.5" y2="78" gradientUnits="userSpaceOnUse">
-                            <stop offset="0.0" stop-color="#C4C4C4" stop-opacity="1.0"></stop>
-                            <stop offset="1.0" stop-color="#F2F2F2" stop-opacity="1.0"></stop>
-                        </linearGradient>
-                        <radialGradient id="backwall" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 56) rotate(-90) scale(45.5 74.4907)">
-                            <stop offset="0.0" stop-color="#AAAAAA" stop-opacity="1.0"></stop>
-                            <stop offset="1.0" stop-color="#333333" stop-opacity="1.0"></stop>
-                        </radialGradient>
-                        <radialGradient id="clearcoat" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(39 38.5) rotate(90) scale(50.5 71.9394)">
-                            <stop offset="0.0" stop-color="#ffffff" stop-opacity="0.0"></stop>
-                            <stop offset="0.7" stop-color="#ffffff" stop-opacity="1.0"></stop>
-                        </radialGradient>
-                        <radialGradient id="light" cx="0" cy="0" r="1.0" gradientUnits="userSpaceOnUse" gradientTransform="translate(39.5 39.5) rotate(90) scale(39.5)">
-                            <stop offset="0.2" stop-color="#ffffff" stop-opacity="1.0"></stop>
-                            <stop offset="0.5" stop-color="#ff8800" stop-opacity="1.6"></stop>
-                            <stop offset="0.9" stop-color="#ffffff" stop-opacity="0.0"></stop>
-                        </radialGradient>
-                    </defs>
-                </svg>
             </div>
         </div>
 
         <div class="col-start-1 col-end-7  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
+            <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Thresholds</p>
+            <div class="border-y-1 border-t-slate-300 border-b-white"></div>
             <div class="p-4">
-                <div class="box-buttons flex-col md:flex-row lg:flex-col gap-2 items-stretch min-w-[50%]">
-                    <strong class="self-center">Threshold</strong>
+                <div class="box-buttons flex-col md:flex-row flex-wrap gap-2 items-stretch min-w-[50%]">
                     <${Button}
                         onClick=${()=>Dispatch({Name:"Mark", Data:true })}
-                        classes="text-md w-full"
+                        classes="text-sm flex-1"
                         icon=${html`
-                            <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                            <svg class="h-2 w-2 overflow-visible stroke(white 2)">
                                 <${State.Chan.Value ? Glyph.O : Glyph.X}/>
                             </svg>`}
                     >
                         Accept
                     <//>
                     <${Button}
-                        onClick=${()=>Dispatch({Name:"Mark", Data:false})}
-                        classes="text-sm w-full"
+                        onClick=${()=>Dispatch({Name:"Mark", Data:null })}
+                        classes="text-sm flex-1"
                         icon=${html`
-                            <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
+                        <svg class="h-2 w-2 overflow-visible stroke(white 2)">
+                            <${Glyph.Null}/>
+                        </svg>
+                        `}
+                        disabled=${State.Live.Mark.User == undefined}
+                    >
+                        Clear
+                    <//>
+                    <${Button}
+                        onClick=${()=>Dispatch({Name:"Mark", Data:false})}
+                        classes="text-sm flex-1 leading-none"
+                        icon=${html`
+                            <svg class="h-[6px] w-[6px] overflow-visible stroke(white 2)">
                                 <${State.Chan.Value ? Glyph.O : Glyph.X}>
                                     <${Glyph.Arrow}/>
                                 <//>
                             </svg>`}
                     >
                         No Response
-                    <//>
-                    <${Button}
-                        icon=${html`
-                        <svg class="h-2 w-2 mx-1 overflow-visible stroke(white 2)">
-                            <${Glyph.Null}/>
-                        </svg>
-                        `}
-                        onClick=${()=>Dispatch({Name:"Mark", Data:null })}
-                        classes="text-sm w-full"
-                        disabled=${State.Live.Mark.User == undefined}
-                    >
-                        Clear
                     <//>
                 </div>
             </div>
@@ -348,7 +354,7 @@ export function Chart({children})
         );
     }
     return html`
-    <div class="relative w-full pb-[calc(90%+70px)] md:pb-[calc(65%+70px)] lg:pb-[calc(55%+70px)] font(sans medium) text(xs) self-start">
+    <div class="relative w-full pb-[calc(90%+70px)] md:pb-[calc(65%+70px)] lg:pb-[calc(45%+70px)] font(sans medium) text(xs) self-start">
         <div class="absolute right-0 bottom-0 w-[calc(100%-60px)] h-[calc(100%-70px)] border(1 zinc-300)">
             <span class="block        absolute top-[-65px] left-0  w-full      text(sm center)     font-black">Frequency (Hz)</span>
             <span class="inline-block absolute top-[50%]   left-[-50px] ">
