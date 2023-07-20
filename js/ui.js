@@ -44,40 +44,54 @@ export const Header =()=>
     const grade = State.Live.Test?.Done || {Marks:0, Total:0, Score:0};
 
     /** @type {(e:Event)=>void} */
-    const handleChange =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
+    const handleChangeCondition =(e)=> Dispatch({Name:"Test", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
+    /** @type {(e:Event)=>void} */
+    const handleChangeReliability =(e)=> Dispatch({Name:"Errs", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
 
     return html`
-    <div class="grid grid-cols-12 bg-metal rounded-lg overflow-hidden shadow-md">
+    <div class="flex">
 
         <div class="p-4 col-start-1 col-end-13 lg:col-end-3">
             <img class="h-auto w-full max-w-[220px]" src=${staticPath+"logo.png"}/>
         </div>
 
-        <div class="p-4 col-start-1 col-end-13 lg:(col-start-3 col-end-10)">
-            <div class="box-buttons w-full">
-                <select id="test-select" class="w-full px-2 py-2 rounded-lg border(1 slate-200) font-bold text(xl white) cursor-pointer bg-earmark" value=${State.Pick} onChange=${handleChange}>
-                    ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
-                </select>
+        <div class="bg-metal rounded-lg shadow-md flex-1">
+            <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Test Patient</p>
+            <div class="border-y-1 border-t-slate-300 border-b-white"></div>
+
+            <div class="flex">
+                <div class="p-2 pr-0 flex-1">
+                    <div class="flex flex-wrap flex-row items-stretch box-buttons">
+                        <p class="px-2 self-center text(center sm) font-bold lg:w-auto">Condition:</p>
+                        <select id="test-select" class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-earmark" value=${State.Pick} onChange=${handleChangeCondition}>
+                            ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
+                        </select>
+                    </div>
+                </div>
+                <div class="p-2 flex-2">
+                    <div class="flex flex-wrap flex-row items-stretch box-buttons">
+                        <p class="px-2 self-center text(center sm) font-bold lg:w-auto">Reliability:</p>
+                        <select class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-earmark" value=${State.Errs} onChange=${handleChangeReliability}>
+                            <option class="text-black" value=${0}>Perfect (Training Mode)</option>
+                            <option class="text-black" value=${1}>Good</option>
+                            <option class="text-black" value=${2}>Reduced</option>
+                            <option class="text-black" value=${3}>Poor</option>
+                        </select>
+                        <!--
+                        <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="basis-[calc(50%-2px)] md:flex-1 lg:flex-[1.5] text-xs" classesActive="bg-green-600"   onClick=${()=>Dispatch({Name:"Errs", Data:0})}><strong class="mr-1">Perfect</strong><span>(Training Mode)</span><//>
+                        <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs"  classesActive="bg-yellow-600" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Good<//>
+                        <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs"  classesActive="bg-orange-700" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Reduced<//>
+                        <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs"  classesActive="bg-red-800"     onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Poor<//>
+                        -->
+                    </div>
+                </div>
             </div>
-            <div class="flex flex-wrap flex-row items-stretch box-buttons w-full mt-2">
-                <p class="px-2 self-center text-center font-bold w-full lg:w-auto">Patient Reliability:</p>
-                <${Button} inactive=${State.Errs == 0} light=${State.Errs == 0} classes="basis-[calc(50%-2px)] md:flex-1 lg:flex-[1.5] text-xs" classesActive="bg-green-600" onClick=${()=>Dispatch({Name:"Errs", Data:0})}><strong class="mr-1">Perfect</strong><span>(Training Mode)</span><//>
-                <${Button} inactive=${State.Errs == 1} light=${State.Errs == 1} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs" classesActive="bg-yellow-600" onClick=${()=>Dispatch({Name:"Errs", Data:1})}>Good<//>
-                <${Button} inactive=${State.Errs == 2} light=${State.Errs == 2} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs" classesActive="bg-orange-700" onClick=${()=>Dispatch({Name:"Errs", Data:2})}>Reduced<//>
-                <${Button} inactive=${State.Errs == 3} light=${State.Errs == 3} classes="basis-[calc(50%-2px)] md:flex-1  font-bold   text-xs" classesActive="bg-red-800" onClick=${()=>Dispatch({Name:"Errs", Data:3})}>Poor<//>
-            </div>
+
+
         </div>
 
-        <div class="p-4 col-start-1 col-end-13 lg:(col-start-10 col-end-13 pl-0)">
-            <div class="box-buttons flex-col justify-center">
-                <div><strong>Complete: ${grade.Marks} of ${grade.Total}</strong></div>
-                <div class="w-full h-4 bg-zinc-400 rounded-full overflow-hidden">
-                    <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-earmark"></div>
-                </div>
-                <div class="text-sm">Accuracy: ${grade.Score}%</div>
-                <${Button} disabled=${grade.Marks == 0} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>
-            </div>
-        </div>
+
+
     </div>`;
 }
 
@@ -85,17 +99,28 @@ export const Header =()=>
 export const Display =()=>
 {
     const [State, Dispatch] = Store.Consumer();
+    const grade = State.Live.Test?.Done || {Marks:0, Total:0, Score:0};
     return html`
     
-        <div class="flex w-full">
-            <div class="flex-1 bg-metal rounded-lg overflow-hidden shadow-md p-4">
-                <div class="box-buttons">
-                    <p>Toggle Overlay</p>
-                    <${Button} light=${State.Show.Cursor} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowCursor", Data:!State.Show.Cursor})}>Cursor<//>
-                    <${Button} light=${State.Show.Answer} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowAnswer", Data:!State.Show.Answer})}>Answer<//>
+            <div class="flex bg-metal rounded-lg overflow-hidden shadow-md">
+                <div class="p-2 flex-2">
+                    <div class="box-buttons">
+                        <p>Display</p>
+                        <${Button} light=${State.Show.Cursor} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowCursor", Data:!State.Show.Cursor})}>Cursor<//>
+                        <${Button} light=${State.Show.Answer} classes="flex-1 text-xs" onClick=${()=>Dispatch({Name:"ShowAnswer", Data:!State.Show.Answer})}>Answer<//>
+                    </div>
+                </div>
+                <div class="p-2 flex-1">
+                    <div class="box-buttons flex justify-center">
+                        <div class="px-2 font-bold">Complete: ${grade.Marks} of ${grade.Total}</div>
+                        <div class="flex-1 h-4 bg-zinc-400 rounded-full overflow-hidden">
+                            <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-earmark"></div>
+                        </div>
+                        <div class="px-2 text-sm">Accuracy: ${grade.Score}%</div>
+                        <${Button} disabled=${grade.Marks == 0} classes="text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>
+                    </div>
                 </div>
             </div>
-        </div>
     
     `;
 };
@@ -142,14 +167,14 @@ export const Controls =()=>
         <div class="col-start-1 col-end-7 md:col-end-4 lg:col-end-7  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Controls</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>
-            <div class="p-4 pb-1">
+            <div class="p-2 pb-1">
                 <div class="box-buttons min-w-[50%]">
                     <p class="text(sm ) mx-2">Channel</p>
                     <${Button} inactive=${State.Chan.Value == 0} light=${State.Chan.Value == 0} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:-1})}>Left<//>
                     <${Button} inactive=${State.Chan.Value == 1} light=${State.Chan.Value == 1} classes="flex-1 text-sm" onClick=${()=>Dispatch({Name:"Chan", Data:1})}>Right<//>
                 </div>
             </div>
-            <div class="p-4 py-1">
+            <div class="p-2 py-1">
                 <div class="box-buttons min-w-[50%]">
                     <div class="flex-1 text-center">
                         <p class="text-sm">Frequency <strong>${Store.ColumnMapping[State.Freq.Value][0]}</strong> (Hz) </p>
@@ -166,7 +191,7 @@ export const Controls =()=>
                     <//>
                 </div>
             </div>
-            <div class="p-4 pt-2">
+            <div class="p-2 pt-2">
                 <div class="box-buttons min-w-[50%]">
                     <div class="flex-1 text-center">
                         <p class="text-sm">Hearing Level <strong>${State.Stim.Value}</strong> (dBHL)</p>
@@ -188,7 +213,7 @@ export const Controls =()=>
         <div class="col-start-1 col-end-7 md:col-start-4 lg:col-start-1  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Tone</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>
-            <div class="p-4">
+            <div class="p-2">
                 <div class="box-buttons flex-1">
                     <div class="flex-1">
                         <div class="flex gap-1 mb-2">
@@ -245,7 +270,7 @@ export const Controls =()=>
         <div class="col-start-1 col-end-7  flex-col bg-metal rounded-lg overflow-hidden shadow-md">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Thresholds</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>
-            <div class="p-4">
+            <div class="p-2">
                 <div class="box-buttons flex-col md:flex-row flex-wrap gap-2 items-stretch min-w-[50%]">
                     <${Button}
                         onClick=${()=>Dispatch({Name:"Mark", Data:true })}
@@ -315,8 +340,8 @@ export const Audiogram =()=>
     ${
         State.Show.Cursor && html`
         <svg class="absolute top-0 w-1 h-1 overflow-visible transition-all duration-500" style=${{top:State.Draw.Cross?.Y, left:State.Draw.Cross?.X}}>
-            <ellipse cx="0" cy="0" rx="8" ry="30" fill="url(#glow)"></ellipse>
-            <ellipse cx="0" cy="0" rx="30" ry="8" fill="url(#glow)"></ellipse>
+            <ellipse cx="0" cy="0" rx="5" ry="30" fill="url(#glow)"></ellipse>
+            <ellipse cx="0" cy="0" rx="30" ry="5" fill="url(#glow)"></ellipse>
             <defs>
                 <radialGradient id="glow">
                     <stop stop-color=${State.Chan.Value ? "red" : "blue"} stop-opacity="0.6" offset="0.0"></stop>
