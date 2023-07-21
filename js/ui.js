@@ -49,17 +49,17 @@ export const Header =()=>
     const handleChangeReliability =(e)=> Dispatch({Name:"Errs", Data:parseInt(/** @type {HTMLSelectElement}*/(e.target).value)});
 
     return html`
-    <div class="flex">
+    <div class="flex flex-col lg:flex-row">
 
-        <div class="p-4 col-start-1 col-end-13 lg:col-end-3">
-            <img class="h-auto w-full max-w-[220px]" src=${staticPath+"logo.png"}/>
+        <div class="p-4 box-border w-full lg:w-[350px] self-stretch">
+            <img class="h-24 w-full object-contain object-center lg:object-left" src=${staticPath+"logo.png"}/>
         </div>
 
         <div class="bg-metal rounded-lg shadow-md flex-1">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Test Patient</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>
 
-            <div class="flex">
+            <div class="flex flex-col md:flex-row">
                 <div class="p-2 pr-0 flex-1">
                     <div class="flex flex-wrap flex-row items-stretch box-buttons">
                         <p class="px-2 self-center text(center sm) font-bold lg:w-auto">Condition:</p>
