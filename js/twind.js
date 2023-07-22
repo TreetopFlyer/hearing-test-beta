@@ -67,11 +67,14 @@ export const Configure = {
         [
             'shadow-sss',
             {
-                "box-shadow": "rgb(0 0 0 / 50%) 0px -2px 3px inset, rgb(255 255 255 / 50%) 0px 10px 10px inset"
+                "box-shadow": "rgb(0 0 0 / 30%) 0px -2px 3px inset, rgb(255 255 255 / 10%) 0px 10px 10px inset"
             }
         ],
         [
             'text-shadow-lcd', {"text-shadow": "0px 1px 1px #00000055"}
+        ],
+        [
+            'text-shadow-emboss', {"text-shadow": "0px -1px 1px #00000033, 0px 1px 2px #ffffff"}
         ],
         [ 'box-notch', "border-t(1 [#ffffff]) border-r(1 [#ffffff]) border-b(1 [#00000033]) border-l(1 [#00000033]) flex items-center justify-end gap-1 p-2" ],
         [ "box-buttons", "flex gap-1 items-center p-2 rounded-lg bg-gradient-to-b from-[#00000022] border-b(1 [#ffffff]) border-t(1 [#00000033])"]

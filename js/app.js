@@ -23,7 +23,7 @@ React.render(html`
             <${UI.Controls}/>
             <${UI.Chart}>
                 <${UI.Audiogram}/>
-                <div class="absolute left-0 w-full top-full md:(w-[300px] left-auto top-auto -right-[10px] -bottom-[10px])">
+                <div class="absolute left-0 w-full top-full md:( left-auto top-auto -right-[10px] -bottom-[10px])">
                     <${UI.Display}/>
                 </div>
             <//>
