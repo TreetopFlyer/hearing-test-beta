@@ -39,9 +39,7 @@ export const Grade =(inTest)=>
     {
         const err = Math.abs(inGoal-inResult);
         if(err == 0){ return 1; }
-        else if(err > 0 && err <= 5){ return 0.9; }
-        else if(err > 5 && err <= 10){ return 0.7; }
-        else if(err > 10 && err <= 15){ return 0.2; }
+        else if(err > 0 && err <= 5){ return 0.5; }
         else{ return 0; }
     }
 
