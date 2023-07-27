@@ -143,7 +143,7 @@ export const Controls =()=>
         if(playGet == 1)
         {
             const volNorm = (State.Stim.Value-State.Stim.Min)/(State.Stim.Max-State.Stim.Min);
-            Tone.Play(!pulsedGet, State.Chan.Value, Store.ColumnMapping[State.Freq.Value][0], (volNorm*0.8) + 0.1);
+            !State.Mute && Tone.Play(!pulsedGet, State.Chan.Value, Store.ColumnMapping[State.Freq.Value][0], (volNorm*0.8) + 0.1);
 
             if(State.Live.Freq)
             {
@@ -245,6 +245,10 @@ export const Controls =()=>
                             >
                                 <span class="py-2 text-sm leading-none">Present Tone</span>
                             <//>
+                        </div>
+                        <div class="flex gap-1 mt-2">
+                            <${Button} onClick=${()=>Dispatch({Name:"Mute", Data:true})}  light=${State.Mute } inactive${!State.Mute} classes="flex-1 text(center xs)">Silent    <//>
+                            <${Button} onClick=${()=>Dispatch({Name:"Mute", Data:false})} light=${!State.Mute} inactive${State.Mute}  classes="flex-1 text(center xs)">Audible<//>
                         </div>
                     </div>
                     <div class="">

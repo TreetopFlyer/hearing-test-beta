@@ -36,6 +36,7 @@ declare namespace Store {
     Stim: Range;
     Errs: number;
     Pick: number;
+    Mute: boolean;
     Show:
     {
       Cursor:boolean,
@@ -58,9 +59,10 @@ declare namespace Store {
   type ActionStim = { Name: "Stim"; Data: number };
   type ActionErrs = { Name: "Errs"; Data: number };
   type ActionKill = { Name: "Kill"; Data: number };
+  type ActionMute = { Name: "Mute"; Data: boolean };
   type ActionShowCursor = {Name: "ShowCursor", Data:boolean};
   type ActionShowAnswer = {Name: "ShowAnswer", Data:boolean};
-  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionErrs | ActionKill | ActionShowCursor | ActionShowAnswer;
+  type Action = ActionMark | ActionTest | ActionChan | ActionFreq | ActionStim | ActionErrs | ActionKill | ActionMute | ActionShowCursor | ActionShowAnswer;
   type Reducer = (inState: State, inAction: Action) => State;
   type ContextUpdater = (inState: State) => boolean;
 

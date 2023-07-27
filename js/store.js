@@ -235,6 +235,10 @@ export function Reducer(inState, inAction)
             SaveTests(clone);
         }
     }
+    else if (Name == "Mute")
+    {
+        clone.Mute = Data;
+    }
     else if (Name == "ShowCursor")
     {
         clone.Show.Cursor = Data;
@@ -323,7 +327,7 @@ if(PreviewText)
     }    
 }
 
-const AppVersion = `0.0.0`;
+const AppVersion = `0.0.1`;
 const savedVersion = localStorage.getItem("app-version");
 if(savedVersion && (AppVersion > savedVersion))
 {
@@ -351,6 +355,7 @@ const SettingsDefault =
     Stim: { Min:-10, Max:120, Value:30, Step:5 },
     Errs: 0,
     Pick: 0,
+    Mute: false,
     Show: { Cursor:true, Answer:false }
 };
 /** @type {Store.StatePartSimple} */
@@ -362,12 +367,13 @@ const SaveSettings =(inState)=>
     {
         /** @type {Store.StatePartSimple} */
         const clone = {
-            Chan:inState.Chan,
-            Freq:inState.Freq,
-            Stim:inState.Stim,
-            Errs:inState.Errs,
-            Pick:inState.Pick,
-            Show:inState.Show
+            Chan: inState.Chan,
+            Freq: inState.Freq,
+            Stim: inState.Stim,
+            Errs: inState.Errs,
+            Pick: inState.Pick,
+            Show: inState.Show,
+            Mute: inState.Mute
         };
         localStorage.setItem("app-settings", JSON.stringify(clone));      
     }
