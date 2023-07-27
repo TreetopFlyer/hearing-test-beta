@@ -133,6 +133,9 @@ export const Controls =()=>
 
     const [pulsedGet, pulsedSet] = React.useState(true);
     const [playGet, playSet] = React.useState(0);
+
+    const errorsRef = React.useRef(0);
+
     React.useEffect(()=>
     {
         /** @type {number|undefined} */
@@ -140,7 +143,7 @@ export const Controls =()=>
         if(playGet == 1)
         {
             const volNorm = (State.Stim.Value-State.Stim.Min)/(State.Stim.Max-State.Stim.Min);
-            Tone.Play(!pulsedGet, State.Chan.Value, Store.ColumnMapping[State.Freq.Value][0], (volNorm*0.8) + 0.1);
+            !State.Mute && Tone.Play(!pulsedGet, State.Chan.Value, Store.ColumnMapping[State.Freq.Value][0], (volNorm*0.8) + 0.1);
 
             if(State.Live.Freq)
             {
@@ -148,16 +151,27 @@ export const Controls =()=>
 
                 const errorScaled = State.Live.Mark.Errs;
                 const errorSampled = Math.random() < errorScaled;
-                const percieved = errorSampled ? !audible : audible;
+                if(errorSampled)
+                {
+                    //console.log("errored!")
+                    errorsRef.current++;
+                }
+                const percieved = (errorSampled && errorsRef.current<3) ? !audible : audible;
 
                 const handler = percieved ? ()=>playSet(2) : ()=>playSet(0);
-                console.log("Audible:", audible, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled, "Percieved", percieved);
+                console.log("Audible:", audible, "Error Scaled:", errorScaled, "Error Sampled:", errorSampled, "Errors count:", errorsRef.current, "Percieved", percieved);
                 timer = setTimeout(handler, 800 + Math.random()*1300);
             }
         }
         return () => clearTimeout(timer);
         
     }, [playGet]);
+
+    React.useEffect(()=>
+    {
+        //console.log("resetting errors");
+        errorsRef.current = 0;
+    }, [State.Chan.Value, State.Freq.Value, State.Stim.Value]);
 
     const classTitle = "flex-1 text-sm"
 
@@ -231,6 +245,10 @@ export const Controls =()=>
                             >
                                 <span class="py-2 text-sm leading-none">Present Tone</span>
                             <//>
+                        </div>
+                        <div class="flex gap-1 mt-2">
+                            <${Button} onClick=${()=>Dispatch({Name:"Mute", Data:true})}  light=${State.Mute } inactive${!State.Mute} classes="flex-1 text(center xs)">Silent    <//>
+                            <${Button} onClick=${()=>Dispatch({Name:"Mute", Data:false})} light=${!State.Mute} inactive${State.Mute}  classes="flex-1 text(center xs)">Audible<//>
                         </div>
                     </div>
                     <div class="">
