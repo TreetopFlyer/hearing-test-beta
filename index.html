@@ -6,18 +6,7 @@
     <body>
         <div id="app"></div>
         <script type="importmap-shim" src="./deno.json"></script>
-        <script type="module-shim">
-            import App from "js/app.js";
-            App(
-            {
-                configure({theme})
-                {
-                    theme.extend.colors.gradientA = "red";
-                    theme.extend.colors.gradientB = "blue";
-                }
-            }
-            );
-        </script>
+        <script type="module-shim">import "app";</script>
         <script async src="https://unpkg.com/es-module-shims@0.13.1/dist/es-module-shims.min.js"></script>
     </body>
 </html>

@@ -92,9 +92,11 @@ const configuration = {
 
 export const Configure=()=>{}
 
-/** @type {(elStyle:HTMLStyleElement, elDiv:HTMLDivElement, reconfigure?:(conf:TW.TwindUserConfig)=>TW.TwindUserConfig|undefined|Promise<TW.TwindUserConfig|undefined>)=>void} */
-export const Init =async(elStyle, elDiv, reconfigure=(conf)=>conf)=>
+/** @typedef {(conf:TW.TwindUserConfig)=>void} TwindOverrider*/
+
+/** @type {(elStyle:HTMLStyleElement, elDiv:HTMLDivElement, reconfigure?:TwindOverrider)=>void} */
+export const Init =(elStyle, elDiv, reconfigure=(conf)=>conf)=>
 {
-    const twindSetup = await reconfigure(configuration);
-    TW.observe(TW.twind(twindSetup||configuration, TW.cssom(elStyle)), elDiv);
+    const twindSetup = reconfigure(configuration);
+    TW.observe(TW.twind(configuration, TW.cssom(elStyle)), elDiv);
 };
