@@ -19,7 +19,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     return html`
     <button
         onClick=${handleClick}
-        class="relative flex items-stretch shadow-sss rounded-md text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-earmark")} ${(inactive||disabled) && "cursor-default"}"
+        class="relative flex items-stretch shadow-sss rounded-md text(lg white) border-t(1 solid [#00000011]) border-b(2 solid [#ffffff]) ring-inset ring-black group transition-all duration-500 ${classes} ${disabled ? "bg-zinc-400" : (classesActive||"bg-gradient")} ${(inactive||disabled) && "cursor-default"}"
     >
         <span class="absolute top-0 left-0 w-full h-full rounded-lg bg-black transition-opacity duration-300 opacity-0 ${(!inactive && !disabled) && "group-hover:opacity-50"}"></span>
         ${ FlashGet > 0 && html`<span key=${FlashGet} class="absolute top-0 left-0 w-full h-full rounded-lg bg-green-400 shadow-glow-green-300 animate-flash"></span>` }
@@ -35,10 +35,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     </button>`;
 }
 
-const staticPath = await import.meta.resolve("$/");
-
-/** @type {BasicElement} */
-export const Header =()=>
+export const Header =(/** @type {{logo:string}}*/props)=>
 {
     const [State, Dispatch] = Store.Consumer();
     const grade = State.Live.Test?.Done || {Marks:0, Total:0, Score:0};
@@ -52,7 +49,7 @@ export const Header =()=>
     <div class="flex flex-col lg:flex-row">
 
         <div class="p-4 box-border w-full lg:w-[350px] self-stretch">
-            <img class="h-24 w-full object-contain object-center lg:object-left" src=${staticPath+"logo.png"}/>
+            <img class="logo" src=${props.logo}/>
         </div>
 
         <div class="bg-metal rounded-lg shadow-md flex-1">
@@ -63,7 +60,7 @@ export const Header =()=>
                 <div class="p-2 pr-0 flex-1">
                     <div class="flex flex-wrap flex-row items-stretch box-buttons">
                         <p class="px-2 self-center text(center sm) font-bold lg:w-auto">Condition:</p>
-                        <select id="test-select" class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-earmark" value=${State.Pick} onChange=${handleChangeCondition}>
+                        <select id="test-select" class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-gradient" value=${State.Pick} onChange=${handleChangeCondition}>
                             ${State.Test.map((t, i)=>html`<option class="text-black" value=${i}>${t.Name}</option>`)}
                         </select>
                     </div>
@@ -71,7 +68,7 @@ export const Header =()=>
                 <div class="p-2 flex-2">
                     <div class="flex flex-wrap flex-row items-stretch box-buttons">
                         <p class="px-2 self-center text(center sm) font-bold lg:w-auto">Reliability:</p>
-                        <select class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-earmark" value=${State.Errs} onChange=${handleChangeReliability}>
+                        <select class="flex-1 px-2 py-2 rounded-lg border(1 slate-200) font-bold text(md white center) cursor-pointer bg-gradient" value=${State.Errs} onChange=${handleChangeReliability}>
                             <option class="text-black" value=${0}>Perfect (Training Mode)</option>
                             <option class="text-black" value=${1}>Good</option>
                             <option class="text-black" value=${2}>Reduced</option>
@@ -114,7 +111,7 @@ export const Display =()=>
                     <div class="box-buttons flex justify-center">
                         <div class="px-2 font-bold">Complete: ${grade.Marks} of ${grade.Total}</div>
                         <div class="flex-1 h-4 bg-zinc-400 rounded-full overflow-hidden">
-                            <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-earmark"></div>
+                            <div class="h-full w-[${grade.Marks/grade.Total*100}%] bg-gradient"></div>
                         </div>
                         <div class="px-2 text-sm">Accuracy: ${grade.Score}%</div>
                         <${Button} disabled=${grade.Marks == 0} classes="text-xs" onClick=${()=>Dispatch({Name:"Kill", Data:0})}>Start Over<//>

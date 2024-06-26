@@ -4,7 +4,8 @@
     "@twind/": "https://esm.sh/@twind/",
     "react": "https://esm.sh/preact@10.11.3/compat",
     "htm": "https://esm.sh/htm@3.1.1/preact",
-    "app": "./js/app.js",
-    "$/": "./static/"
+    "static/": "./static/",
+    "js/": "./js/",
+    "logo": "./static/logo.png"
   }
 }

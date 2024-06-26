@@ -3,7 +3,7 @@ import TWPreTail from "@twind/preset-tailwind@1.0.1";
 import TWPreAuto from "@twind/preset-autoprefix@1.0.1";
 
 /** @type {TW.TwindUserConfig} */
-export const Configure = {
+const configuration = {
     theme:
     {
         extend:
@@ -35,18 +35,21 @@ export const Configure = {
             strokeWidth:
             {
                 "bold": "4px"
+            },
+            colors:
+            {
+                gradientA: "#107c79",
+                gradientB: "#115e67",
             }
         }
     },
     rules:
     [
         [
-            "stroke-draw",
-            {
-                "vector-effect": "non-scaling-stroke",
-                "stroke-linecap": "square",
-                "fill": "none"
-            },
+            "logo", "h-24 w-full object-contain object-center lg:object-left"
+        ],
+        [
+            "bg-gradient", "bg-gradient-to-b from-gradientA to-gradientB"
         ],
         [
             "bg-metal",
@@ -55,7 +58,12 @@ export const Configure = {
             },
         ],
         [
-            "bg-earmark", "bg-gradient-to-b from-[#107c79] to-[#115e67]"
+            "stroke-draw",
+            {
+                "vector-effect": "non-scaling-stroke",
+                "stroke-linecap": "square",
+                "fill": "none"
+            },
         ],
         [
             'shadow-glow-(.*)',
@@ -82,8 +90,11 @@ export const Configure = {
     presets: [TWPreTail(), TWPreAuto()]
 };
 
-/** @type {(elStyle:HTMLStyleElement, elDiv:HTMLDivElement)=>void} */
-export const Init =(elStyle, elDiv)=>
+export const Configure=()=>{}
+
+/** @type {(elStyle:HTMLStyleElement, elDiv:HTMLDivElement, reconfigure?:(conf:TW.TwindUserConfig)=>TW.TwindUserConfig|undefined|Promise<TW.TwindUserConfig|undefined>)=>void} */
+export const Init =async(elStyle, elDiv, reconfigure=(conf)=>conf)=>
 {
-    TW.observe(TW.twind(Configure, TW.cssom(elStyle)), elDiv);
+    const twindSetup = await reconfigure(configuration);
+    TW.observe(TW.twind(twindSetup||configuration, TW.cssom(elStyle)), elDiv);
 };
