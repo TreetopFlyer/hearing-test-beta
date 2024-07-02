@@ -1,5 +1,5 @@
-import React from "react";
-import { html } from "htm";
+import React from "https://esm.sh/preact@10.11.3/compat";
+import { html } from "https://esm.sh/htm@3.1.1/preact";
 import * as Store from "./store.js";
 import * as Tone from "./tone.js";
 
@@ -35,7 +35,7 @@ export function Button({children, icon, light, disabled, inactive, onClick, clas
     </button>`;
 }
 
-export const Header =(/** @type {{logo:string}}*/props)=>
+export const Header =(/** @type {{logo?:string}}*/props)=>
 {
     const [State, Dispatch] = Store.Consumer();
     const grade = State.Live.Test?.Done || {Marks:0, Total:0, Score:0};
@@ -48,10 +48,10 @@ export const Header =(/** @type {{logo:string}}*/props)=>
     return html`
     <div class="flex flex-col lg:flex-row">
 
-        <div class="p-4 box-border w-full lg:w-[350px] self-stretch">
+        ${ props.logo && html`<div class="p-4 box-border w-full lg:w-[350px] self-stretch">
             <img class="logo" src=${props.logo}/>
-        </div>
-
+        </div>`}
+        
         <div class="bg-metal rounded-lg shadow-md flex-1">
             <p class="text(center shadow-emboss slate-900) uppercase font-bold py-2">Test Patient</p>
             <div class="border-y-1 border-t-slate-300 border-b-white"></div>

@@ -1,11 +1,3 @@
 {
-  "compilerOptions": { "types": ["*.d.ts"], "checkJs": true },
-  "imports": {
-    "@twind/": "https://esm.sh/@twind/",
-    "react": "https://esm.sh/preact@10.11.3/compat",
-    "htm": "https://esm.sh/htm@3.1.1/preact",
-    "app" : "./js/app.js",
-    "mount" : "./js/mount.js",
-    "logo": "./static/logo.png"
-  }
+  "compilerOptions": { "types": ["*.d.ts"], "checkJs": true }
 }
