@@ -1,2 +1,2 @@
 import App from "./app.js";
-App({logo:"logo"});
+App({logo:"../static/logo.png"});
